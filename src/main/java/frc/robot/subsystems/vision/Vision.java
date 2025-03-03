@@ -28,6 +28,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.subsystems.vision.VisionIO.VisionIOInputs;
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class Vision extends SubsystemBase {
   }
 
   LoggedNetworkNumber ambiguity = new LoggedNetworkNumber("Vision/Tuning/Ambiguity", 0.3);
-  LoggedNetworkNumber zError = new LoggedNetworkNumber("Vision/Tuning/zError", 0.1);
+  LoggedNetworkNumber zError = new LoggedNetworkNumber("Vision/Tuning/zError", 0.2);
 
   @Override
   public void periodic() {
@@ -199,8 +200,8 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected",
         allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
-    // Constants.VisionConstants.maxAmbiguity = ambiguity.get();
-    // Constants.VisionConstants.maxZError = zError.get();
+    Constants.VisionConstants.maxAmbiguity = ambiguity.get();
+    Constants.VisionConstants.maxZError = zError.get();
   }
 
   public void calculateTagPositions(Supplier<Pose2d> robotPoseSupplier) {

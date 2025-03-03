@@ -4,6 +4,8 @@
 
 package frc.robot.commands.Autons;
 
+import static frc.robot.Constants.Setpoints.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -13,27 +15,27 @@ import frc.robot.commands.ScoringCommands.ScoreSetpoint;
 import frc.robot.commands.ScoringCommands.TravelPosition;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Elevator;
+import frc.robot.subsystems.Mechanisms.EndEffector;
 import frc.robot.util.CustomAutoBuilder;
-
-import static frc.robot.Constants.Setpoints.*;
 
 public class Left3Auton extends SequentialCommandGroup {
 
   /** Creates a new L4Auton. */
-  public Left3Auton(Elevator m_Elevator, Arm m_Arm) {
+  public Left3Auton(Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector) {
     Command[] drivePaths = CustomAutoBuilder.getDrivePaths();
 
     addCommands(
         drivePaths[0],
-        new ScoreSetpoint(m_Elevator, m_Arm, L3_HEIGHT_IN, L3_ANGLE),
+        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE),
         Commands.parallel(
             drivePaths[1],
             m_Arm.setPivotAngle(() -> HOME_ANGLE),
-            Commands.sequence(new WaitCommand(0.25), new LoadStationIntake(m_Elevator, m_Arm))),
+            Commands.sequence(
+                new WaitCommand(0.25), new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector))),
         Commands.race(
             drivePaths[2],
             Commands.sequence(new WaitCommand(1), m_Arm.setPivotAngle(() -> HOME_ANGLE))),
-        new ScoreSetpoint(m_Elevator, m_Arm, L3_HEIGHT_IN, L3_ANGLE),
-        new TravelPosition(m_Elevator, m_Arm));
+        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE),
+        new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
   }
 }

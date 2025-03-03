@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.Mechanisms;
 
-import static frc.robot.Constants.Arm.*;
+import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.Setpoints.*;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,15 +22,15 @@ import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
   private final TalonFX arm = new TalonFX(ARM_MOTOR_ID);
-  private final TalonFX endEffector = new TalonFX(END_EFFECTOR_ID);
 
   DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(ARM_ENCODER_PORT);
-  TunablePIDController armPID = new TunablePIDController(0.1, 0.0, 0.0, "/Testing/ArmPID/");
+  TunablePIDController armPID = new TunablePIDController(0.2, 0.0, 0.0, "/Testing/ArmPID/");
+
+  // public final ArmFeedforward armFF = new ArmFeedforward(0.0, 0.5, 0.0);
 
   /** Creates a new Arm. */
   public Arm() {
-    PhoenixUtil.configMotor(arm, true, NeutralModeValue.Brake);
-    PhoenixUtil.configMotor(endEffector, false, NeutralModeValue.Coast);
+    PhoenixUtil.configMotor(arm, false, NeutralModeValue.Brake);
     armPID.enableContinuousInput(-180, 180);
   }
 
@@ -39,8 +39,8 @@ public class Arm extends SubsystemBase {
     arm.setVoltage(voltage);
   }
 
-  public Command setEndEffectorVoltage(Supplier<Double> voltage) {
-    return runOnce(() -> endEffector.setVoltage(voltage.get()));
+  public Command setArmVoltage(Supplier<Double> voltage) {
+    return run(() -> arm.setVoltage(voltage.get()));
   }
 
   /**
@@ -50,8 +50,9 @@ public class Arm extends SubsystemBase {
   public double getPivotAngle() {
     // Using relative since the absolute encoder doesnt work
     // Clockwise should result in positive encoder values
-    double rotations = arm.getPosition().getValueAsDouble() / ARM_GEAR_RATIO;
-    double scaledRotation = rotations % 1;
+    // double rotations = arm.getPosition().getValueAsDouble() / ARM_GEAR_RATIO;
+    // double scaledRotation = rotations % 1;
+    double scaledRotation = pivotEncoder.get();
     // Range is -180 to 180
     double degrees = (scaledRotation - 0.5) * 360 - PIVOT_ANGLE_OFFSET;
     if (degrees < -180) {
@@ -94,20 +95,15 @@ public class Arm extends SubsystemBase {
             pidPart = armPID.calculate(getPivotAngle(), angle.get());
           }
 
-          double ffPart = 0;
+          double ffPart = 0; // armFF.getKg() * Math.cos(Math.toRadians(getPivotAngle()));
           arm.setVoltage(MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE));
         });
-  }
-
-  public double getEndEffectorRPS() {
-    return endEffector.getVelocity().getValueAsDouble();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     Logger.recordOutput("Arm/current angle", getPivotAngle());
-    Logger.recordOutput("Arm/End Effector RPS", getEndEffectorRPS());
     MechanismSimulatorActual.updateArm(getPivotAngle());
     armPID.update();
   }

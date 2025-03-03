@@ -4,7 +4,8 @@
 
 package frc.robot.commands.ScoringCommands;
 
-import org.littletonrobotics.junction.Logger;
+import static frc.robot.Constants.AutonConstants.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -13,34 +14,35 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.CustomAutoBuilder;
 import frc.robot.util.TunablePIDController;
-
-import static frc.robot.Constants.AutonConstants.*;
+import org.littletonrobotics.junction.Logger;
 
 public class AlignReef extends SequentialCommandGroup {
-    private static TunablePIDController drivePID_X = new TunablePIDController(0.7, 0, 0, "/tuning/driveX/");
-    private static TunablePIDController drivePID_Y = new TunablePIDController(0.7, 0, 0, "tuning/driveY/");
+  private static TunablePIDController drivePID_X =
+      new TunablePIDController(2.5, 0, 0.2, "/tuning/driveX/");
+  private static TunablePIDController drivePID_Y =
+      new TunablePIDController(2.5, 0, 0.2, "tuning/driveY/");
 
-    private static Pose2d getClosestPoint(Pose2d curPose) {
-        Pose2d closestPoint = new Pose2d();
-        double closestDistance = Double.MAX_VALUE;
-        for (Pose2d position : poseAngleMap.keySet()) {
-            double dist = position.getTranslation().getDistance(curPose.getTranslation());
-            if (dist < closestDistance) {
-                closestDistance = dist;
-                closestPoint = position;
-            }
-        }
-
-        return closestPoint;
+  private static Pose2d getClosestPoint(Pose2d curPose) {
+    Pose2d closestPoint = new Pose2d();
+    double closestDistance = Double.MAX_VALUE;
+    for (Pose2d position : poseAngleMap.keySet()) {
+      double dist = position.getTranslation().getDistance(curPose.getTranslation());
+      if (dist < closestDistance) {
+        closestDistance = dist;
+        closestPoint = position;
+      }
     }
-  
+
+    return closestPoint;
+  }
+
   /** Creates a new AlignReef. */
   public AlignReef(Drive m_Drive, double reefSide) {
     Pose2d closestPoint = getClosestPoint(m_Drive.getPose());
     Pose2d targetPos = CustomAutoBuilder.applyOffset(closestPoint, reefSide);
 
     addCommands(
-      Commands.parallel(
+        Commands.parallel(
             Commands.run(
                 () -> {
                   drivePID_X.update();
@@ -55,7 +57,6 @@ public class AlignReef extends SequentialCommandGroup {
                 () ->
                     MathUtil.clamp(
                         drivePID_Y.calculate(m_Drive.getPose().getY(), targetPos.getY()), -.5, .5),
-                () -> closestPoint.getRotation()))
-    );
+                () -> closestPoint.getRotation())));
   }
 }

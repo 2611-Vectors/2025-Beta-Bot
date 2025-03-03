@@ -4,7 +4,7 @@
 
 package frc.robot.util;
 
-import static frc.robot.Constants.Arm.*;
+import static frc.robot.Constants.ArmConstants.*;
 
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;

@@ -4,27 +4,31 @@
 
 package frc.robot.subsystems.Mechanisms;
 
-import static frc.robot.Constants.Elevator.*;
+import static frc.robot.Constants.ElevatorConstants.*;
+import static frc.robot.Constants.Setpoints.HOME_HEIGHT_IN;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.MechanismSimulator;
 import frc.robot.util.MechanismSimulatorActual;
 import frc.robot.util.PhoenixUtil;
+import frc.robot.util.TunablePIDController;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Elevator extends SubsystemBase {
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
 
-  private final PIDController elevatorPID = new PIDController(ELEVATOR_P, ELEVATOR_I, ELEVATOR_D);
+  private final TunablePIDController elevatorPID =
+      new TunablePIDController(ELEVATOR_P, ELEVATOR_I, ELEVATOR_D, "/ElevatorPID/");
   public final ElevatorFeedforward elevatorFF = new ElevatorFeedforward(0.0, 0.45, 0.0);
+
+  LoggedNetworkNumber housingDiamter;
 
   /** Creates a new Elevator. */
   public Elevator() {
@@ -33,6 +37,8 @@ public class Elevator extends SubsystemBase {
 
     PhoenixUtil.configMotor(leftMotor, true, NeutralModeValue.Brake);
     PhoenixUtil.configMotor(rightMotor, false, NeutralModeValue.Brake);
+
+    housingDiamter = new LoggedNetworkNumber("/Elevator/Housing Diameter", STRING_HOUSING_DIAMETER);
   }
 
   /** Function for voltage control */
@@ -41,23 +47,46 @@ public class Elevator extends SubsystemBase {
     rightMotor.setVoltage(voltage);
   }
 
+  /** Command for voltage control */
+  public Command setVoltage(Supplier<Double> voltage) {
+    return run(
+        () -> {
+          leftMotor.setVoltage(voltage.get());
+          rightMotor.setVoltage(voltage.get());
+        });
+  }
+
+  public Command holdElevator() {
+    return run(
+        () -> {
+          leftMotor.setVoltage(elevatorFF.getKg());
+          rightMotor.setVoltage(elevatorFF.getKg());
+        });
+  }
+
   /** Sets the Elevator to a target position and should be called periodically unit are in inches */
   public Command setElevatorPosition(Supplier<Double> target) {
     return run(
         () -> {
           double targetActual = target.get();
-          Logger.recordOutput("Elevator/TargetPosition", targetActual);
-
-          // Simulator update
-          MechanismSimulator.updateElevator(targetActual + 20.33);
-          if (!MechanismSimulator.isLegalTarget()) {
-            double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
-            targetActual += offset;
+          if (targetActual < STARTING_HEIGHT) {
+            targetActual = STARTING_HEIGHT + HOME_HEIGHT_IN;
           }
+          // Logger.recordOutput("Elevator/TargetPosition", targetActual);
+
+          // // Simulator update
+          // MechanismSimulator.updateElevator(targetActual + 20.33);
+          // if (!MechanismSimulator.isLegalTarget()) {
+          //   double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
+          //   targetActual += offset;
+          // }
 
           double pidPart = elevatorPID.calculate(getLeftElevatorPosition(), targetActual);
           double ffPart = elevatorFF.calculate(targetActual);
-
+          if (Math.abs(getLeftElevatorPosition() - targetActual) < 0.25) {
+            pidPart = 0;
+            ffPart = elevatorFF.getKg();
+          }
           setVoltage(
               MathUtil.clamp(pidPart + ffPart, -ELEVATOR_MAX_VOLTAGE * 0.5, ELEVATOR_MAX_VOLTAGE));
         });
@@ -78,10 +107,9 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-
-    // Telemetry for position might be useful for the simulator hint hint hint
     Logger.recordOutput("Elevator/LeftEncoder", getLeftElevatorPosition());
     Logger.recordOutput("Elevator/RightEncoder", getRightElevatorPosition());
     MechanismSimulatorActual.updateElevator(getLeftElevatorPosition() + 20.33);
+    elevatorPID.update();
   }
 }

@@ -13,11 +13,11 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.AutonConstants.LEFT_OFFSET;
-import static frc.robot.Constants.AutonConstants.RIGHT_OFFSET;
+import static frc.robot.Constants.AutonConstants.*;
 import static frc.robot.Constants.Setpoints.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -28,15 +28,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.Autons.Left3Auton;
-import frc.robot.commands.ScoringCommands.AlignReef;
-import frc.robot.commands.ScoringCommands.LoadStationIntake;
-import frc.robot.commands.ScoringCommands.ScoreSetpoint;
-import frc.robot.commands.ScoringCommands.TravelPosition;
+import frc.robot.commands.PID_FF_Tuners;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Climb;
 import frc.robot.subsystems.Mechanisms.Elevator;
+import frc.robot.subsystems.Mechanisms.EndEffector;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -47,9 +44,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-
-import java.util.Set;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -64,6 +58,7 @@ public class RobotContainer {
   private final Vision m_Vision;
   private final Elevator m_Elevator;
   private final Arm m_Arm;
+  private final EndEffector m_EndEffector;
   private final Climb m_Climb;
 
   // Controller
@@ -85,12 +80,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        m_Vision = 
+        m_Vision =
             new Vision(
                 m_Drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.BackRightCam, 
-                    VisionConstants.robotToBackRightCam));
+                    VisionConstants.BackRightCam, VisionConstants.robotToBackRightCam));
         break;
 
       case SIM:
@@ -126,6 +120,7 @@ public class RobotContainer {
 
     m_Elevator = new Elevator();
     m_Arm = new Arm();
+    m_EndEffector = new EndEffector();
     m_Climb = new Climb();
 
     // Set up auto routines
@@ -157,39 +152,58 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
+  private final SlewRateLimiter slewRateX = new SlewRateLimiter(1);
+
+  private final SlewRateLimiter slewRateY = new SlewRateLimiter(1);
+
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     m_Drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             m_Drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
+            () -> -slewRateX.calculate(controller.getLeftY()),
+            () -> -slewRateY.calculate(controller.getLeftX()),
             () -> -controller.getRightX()));
 
-    buttonBoard.leftBumper()
-        .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, LEFT_OFFSET), Set.of(m_Drive)));
-    buttonBoard.rightBumper()
-        .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, RIGHT_OFFSET), Set.of(m_Drive)));
+    m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
+    // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
+    m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
+    m_EndEffector.setDefaultCommand(
+        m_EndEffector.setEndEffectorVoltage(() -> buttonBoard.getLeftY() * (0.9 * 12)));
+    // m_Elevator.setDefaultCommand(
+    //     PID_FF_Tuners.ElevatorFFTuner(m_Elevator, () -> buttonBoard.getLeftY()));
 
-    buttonBoard.a()
-        .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, L2_HEIGHT_IN, L2_ANGLE))
-        .onFalse(new TravelPosition(m_Elevator, m_Arm));
+    // buttonBoard
+    //     .leftBumper()
+    //     .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, LEFT_OFFSET), Set.of(m_Drive)));
+    // buttonBoard
+    //     .rightBumper()
+    //     .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, RIGHT_OFFSET), Set.of(m_Drive)));
 
-    buttonBoard.x()
-        .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, L2_HEIGHT_IN, L2_ANGLE))
-        .onFalse(new TravelPosition(m_Elevator, m_Arm));
+    // buttonBoard
+    //     .a()
+    //     .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE))
+    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
-    buttonBoard.b()
-        .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, L3_HEIGHT_IN, L3_ANGLE))
-        .onFalse(new TravelPosition(m_Elevator, m_Arm));
+    // buttonBoard
+    //     .x()
+    //     .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE))
+    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
-    buttonBoard.y()
-        .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, L4_HEIGHT_IN, L4_ANGLE))
-        .onFalse(new TravelPosition(m_Elevator, m_Arm));
+    // buttonBoard
+    //     .b()
+    //     .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE))
+    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
-    buttonBoard.leftStick()
-        .whileTrue(new LoadStationIntake(m_Elevator, m_Arm))
-        .onFalse(new TravelPosition(m_Elevator, m_Arm));
+    // buttonBoard
+    //     .y()
+    //     .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE))
+    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
+
+    // buttonBoard
+    //     .leftStick()
+    //     .whileTrue(new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector))
+    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
     // Lock to 0° when A button is held
     controller

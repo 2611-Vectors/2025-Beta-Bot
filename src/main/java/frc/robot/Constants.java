@@ -13,9 +13,6 @@
 
 package frc.robot;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,6 +21,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.subsystems.Mechanisms.Arm;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -50,10 +50,10 @@ public final class Constants {
     public static final int CLIMB_GRAB_ID = 52;
   }
 
-  public static class Arm {
+  public static class ArmConstants {
     public static final int ARM_MOTOR_ID = 44;
     public static final int ARM_ENCODER_PORT = 0;
-    public static final int PIVOT_ANGLE_OFFSET = -90;
+    public static final int PIVOT_ANGLE_OFFSET = -74;
 
     public static final double ARM_GEAR_RATIO = 43.95;
     public static final double ARM_MAX_VOLTAGE = 2.0; // Set this to 8 for competition
@@ -62,22 +62,22 @@ public final class Constants {
     public static final int END_EFFECTOR_ID = 43;
   }
 
-  public static class Elevator {
+  public static class ElevatorConstants {
     public static final int LEFT_ELEVATOR_ID = 40;
     public static final int RIGHT_ELEVATOR_ID = 41;
 
-    public static final double STARTING_HEIGHT = 0.0;
+    public static final double STARTING_HEIGHT = 18.375;
     public static final double LOWEST_HEIGHT = 0.3;
 
-    public static final double ELEVATOR_P = 3.00;
-    public static final double ELEVATOR_I = 0.01;
+    public static final double ELEVATOR_P = 1.0;
+    public static final double ELEVATOR_I = 0.00;
     public static final double ELEVATOR_D = 0.00;
 
     public static final double ELEVATOR_MAX_VOLTAGE = 2.0; // Set this to 8 for competition
 
     // Constants for the elevator motor system
-    public static final double ELEVATOR_GEAR_RATIO = 4.0;
-    public static final double STRING_HOUSING_DIAMETER = 2.1702;
+    public static final double ELEVATOR_GEAR_RATIO = 34 / 12;
+    public static final double STRING_HOUSING_DIAMETER = 1.665;
 
     // Conversion factor from motor rotations to inches of travel
     public static final double ROTATIONS_TO_INCHES =
@@ -85,19 +85,19 @@ public final class Constants {
   }
 
   public static class Setpoints {
-    public static final double HOME_HEIGHT_IN = 1.0;
-    public static final double TRAVEL_HEIGHT_IN = 1.0;
-    public static final double L2_HEIGHT_IN = 5.0;
-    public static final double L3_HEIGHT_IN = 21.0;
-    public static final double L4_HEIGHT_IN = 46.0;
-    public static final double INTAKE_HEIGHT_IN = 38;
+    public static final double HOME_HEIGHT_IN = 25.0;
+    public static final double TRAVEL_HEIGHT_IN = 25.0;
+    public static final double L2_HEIGHT_IN = 24.0;
+    public static final double L3_HEIGHT_IN = 40.0;
+    public static final double L4_HEIGHT_IN = 67.0;
+    public static final double INTAKE_HEIGHT_IN = 53.25;
 
-    public static final double HOME_ANGLE = -90;
-    public static final double TRAVEL_ANGLE = -90;
+    public static final double HOME_ANGLE = -99;
+    public static final double TRAVEL_ANGLE = -99;
     public static final double L2_ANGLE = -55;
     public static final double L3_ANGLE = -55;
-    public static final double L4_ANGLE = -55;
-    public static final double INTAKE_ANGLE = 69.1;
+    public static final double L4_ANGLE = -40;
+    public static final double INTAKE_ANGLE = Arm.flipAngle(60);
 
     public static final double POSITION_TOLERANCE = 1.0;
     public static final double ANGLE_TOLERANCE = 3.0;
@@ -119,8 +119,8 @@ public final class Constants {
     public static final Pose2d IJ = new Pose2d(5.1079, 5.0974, Rotation2d.fromDegrees(60));
     public static final Pose2d KL = new Pose2d(3.8707, 5.0974, Rotation2d.fromDegrees(120));
 
-    public static final double LEFT_OFFSET = 0.21; // In Meters
-    public static final double RIGHT_OFFSET = -0.13; // In Meters
+    public static final double LEFT_OFFSET = 0.075; // In Meters
+    public static final double RIGHT_OFFSET = -0.255; // In Meters
 
     public static final Pose2d R1 = new Pose2d(1.13847, 7.10903, Rotation2d.fromDegrees(120));
     public static final Pose2d R0 = new Pose2d(1.13847, .94297, Rotation2d.fromDegrees(60));
@@ -153,9 +153,9 @@ public final class Constants {
     // Position of the PhotonVision Reef Camera
     public static Transform3d robotToBackRightCam =
         new Transform3d(
-            Units.inchesToMeters(-3.25),
-            Units.inchesToMeters(-4.375),
-            Units.inchesToMeters(7.5),
+            Units.inchesToMeters(-5.125),
+            Units.inchesToMeters(-4.125),
+            Units.inchesToMeters(8.625),
             new Rotation3d(0.0, Math.toRadians(0), Math.toRadians(180)));
 
     public static String BackLeftCam = "BackLeftCam";

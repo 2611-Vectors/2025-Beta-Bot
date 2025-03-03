@@ -4,21 +4,33 @@
 
 package frc.robot.commands.ScoringCommands;
 
+import static frc.robot.Constants.Setpoints.*;
+
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Elevator;
-
-import static frc.robot.Constants.Setpoints.*;
+import frc.robot.subsystems.Mechanisms.EndEffector;
 
 public class TravelPosition extends SequentialCommandGroup {
-  public TravelPosition(Elevator m_Elevator, Arm m_Arm) {
+  public TravelPosition(Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector) {
     super(
-      m_Arm.setPivotAngle(() -> TRAVEL_ANGLE)
-        .until(() -> Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle())) < ANGLE_TOLERANCE),
-      Commands.parallel(
-        m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
-        m_Elevator.setElevatorPosition(() -> TRAVEL_HEIGHT_IN))
-          .until(() -> Math.abs(TRAVEL_HEIGHT_IN - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE));
+        m_Arm
+            .setPivotAngle(() -> TRAVEL_ANGLE)
+            .until(
+                () ->
+                    Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle()))
+                        < ANGLE_TOLERANCE),
+        Commands.parallel(
+                m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
+                m_Elevator.setElevatorPosition(() -> TRAVEL_HEIGHT_IN))
+            .until(
+                () ->
+                    Math.abs(TRAVEL_HEIGHT_IN - m_Elevator.getLeftElevatorPosition())
+                        < POSITION_TOLERANCE),
+        Commands.parallel(
+            m_Elevator.holdElevator(),
+            m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
+            m_EndEffector.setEndEffectorVoltage(() -> 0d)));
   }
 }
