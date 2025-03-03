@@ -28,15 +28,13 @@ public class LoadStationIntake extends SequentialCommandGroup {
                 () ->
                     Math.abs(Arm.getRelativeAngle(INTAKE_ANGLE, m_Arm.getPivotAngle()))
                         < ANGLE_TOLERANCE),
-        Commands.parallel(
+        Commands.race(
             m_Arm.setPivotAngle(() -> INTAKE_ANGLE),
             m_Elevator.setElevatorPosition(() -> INTAKE_HEIGHT_IN),
             Commands.sequence(
-                m_EndEffector
-                    .setEndEffectorVoltage(() -> -6.0)
-                    .until(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) > 9),
-                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) < 4),
-                m_EndEffector.setEndEffectorVoltage(() -> 0.0))),
-        Commands.parallel(m_Elevator.holdElevator(), m_Arm.setPivotAngle(() -> INTAKE_ANGLE)));
+                m_EndEffector.setEndEffectorVoltage(() -> -6.0),
+                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) > 40),
+                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) < 20),
+                m_EndEffector.setEndEffectorVoltage(() -> 0.0))));
   }
 }

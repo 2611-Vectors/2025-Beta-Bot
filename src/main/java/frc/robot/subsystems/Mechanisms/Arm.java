@@ -19,6 +19,7 @@ import frc.robot.util.PhoenixUtil;
 import frc.robot.util.TunablePIDController;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Arm extends SubsystemBase {
   private final TalonFX arm = new TalonFX(ARM_MOTOR_ID);
@@ -28,10 +29,31 @@ public class Arm extends SubsystemBase {
 
   // public final ArmFeedforward armFF = new ArmFeedforward(0.0, 0.5, 0.0);
 
+  // This is temp
+  LoggedNetworkNumber algaeProccesor_h,
+      algaeP2_h,
+      algaeP3_h,
+      algaeProccesor_a,
+      algaeP2_a,
+      algaeP3_a,
+      algaeSpeed;
+
   /** Creates a new Arm. */
   public Arm() {
     PhoenixUtil.configMotor(arm, false, NeutralModeValue.Brake);
     armPID.enableContinuousInput(-180, 180);
+
+    // This is temp
+    algaeProccesor_h =
+        new LoggedNetworkNumber("SetpointTuning/Proccessor Height", PROCESSOR_HEIGHT);
+    algaeProccesor_a = new LoggedNetworkNumber("SetpointTuning/Proccessor Angle", PROCCESOR_ANGLE);
+
+    algaeP2_h = new LoggedNetworkNumber("SetpointTuning/Algae Pick 2 Height", ALGAE_PICK2_HEIGHT);
+    algaeP2_a = new LoggedNetworkNumber("SetpointTuning/Algae Pick 2 Angle", ALGAE_PICK2_ANGLE);
+
+    algaeP3_h = new LoggedNetworkNumber("SetpointTuning/Algae Pick 3 Height", ALGAE_PICK3_HEIGHT);
+    algaeP3_a = new LoggedNetworkNumber("SetpointTuning/Algae Pick 3 Angle", ALGAE_PICK3_ANGLE);
+    algaeSpeed = new LoggedNetworkNumber("SetpointTunning/AlgaeSpeed", ALGAE_INTAKE_SPEED);
   }
 
   /** Function for voltage control for arm motor */
@@ -106,5 +128,17 @@ public class Arm extends SubsystemBase {
     Logger.recordOutput("Arm/current angle", getPivotAngle());
     MechanismSimulatorActual.updateArm(getPivotAngle());
     armPID.update();
+
+    // This is temp
+    PROCESSOR_HEIGHT = algaeProccesor_h.get();
+    PROCCESOR_ANGLE = algaeProccesor_a.get();
+
+    ALGAE_PICK2_ANGLE = algaeP2_a.get();
+    ALGAE_PICK2_HEIGHT = algaeP2_h.get();
+
+    ALGAE_PICK3_ANGLE = algaeP3_a.get();
+    ALGAE_PICK3_HEIGHT = algaeP3_h.get();
+
+    ALGAE_INTAKE_SPEED = algaeSpeed.get();
   }
 }

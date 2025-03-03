@@ -26,16 +26,23 @@ public class Left3Auton extends SequentialCommandGroup {
 
     addCommands(
         drivePaths[0],
-        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE),
+        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
         Commands.parallel(
             drivePaths[1],
-            m_Arm.setPivotAngle(() -> HOME_ANGLE),
             Commands.sequence(
                 new WaitCommand(0.25), new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector))),
         Commands.race(
             drivePaths[2],
-            Commands.sequence(new WaitCommand(1), m_Arm.setPivotAngle(() -> HOME_ANGLE))),
-        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE),
+            Commands.sequence(new WaitCommand(1), m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))),
+        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
+        Commands.parallel(
+            drivePaths[3],
+            Commands.sequence(
+                new WaitCommand(0.25), new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector))),
+        Commands.race(
+            drivePaths[4],
+            Commands.sequence(new WaitCommand(1), m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))),
+        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
         new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
   }
 }

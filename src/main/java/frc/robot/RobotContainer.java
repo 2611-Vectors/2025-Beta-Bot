@@ -27,8 +27,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.commands.Autons.Left3Auton;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.PID_FF_Tuners;
+import frc.robot.commands.ScoringCommands.AlgaeIntake;
+import frc.robot.commands.ScoringCommands.AlgaeScore;
+import frc.robot.commands.ScoringCommands.AlgaeTravelPosition;
+import frc.robot.commands.ScoringCommands.AlignReef;
+import frc.robot.commands.ScoringCommands.HoldPosition;
+import frc.robot.commands.ScoringCommands.LoadStationIntake;
+import frc.robot.commands.ScoringCommands.ScoreSetpoint;
+import frc.robot.commands.ScoringCommands.TravelPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Climb;
@@ -44,6 +52,8 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.CustomAutoBuilder;
+import java.util.Set;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -84,7 +94,9 @@ public class RobotContainer {
             new Vision(
                 m_Drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.BackRightCam, VisionConstants.robotToBackRightCam));
+                    VisionConstants.BackRightCam, VisionConstants.robotToBackRightCam),
+                new VisionIOPhotonVision(
+                    VisionConstants.FrontLeftCam, VisionConstants.robotToFrontLeftCam));
         break;
 
       case SIM:
@@ -142,6 +154,17 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", m_Drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    autoChooser.addOption(
+        "Camera Pos Calculator",
+        Commands.sequence(
+            Commands.runOnce(
+                () -> m_Drive.setPose(new Pose2d(5.05, 5.24, Rotation2d.fromDegrees(60)))),
+            Commands.parallel(
+                Commands.run(
+                    () ->
+                        m_Vision.calculateCameraPositions(
+                            () -> new Pose2d(5.05, 5.24, Rotation2d.fromDegrees(60)))))));
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -165,45 +188,132 @@ public class RobotContainer {
             () -> -slewRateY.calculate(controller.getLeftX()),
             () -> -controller.getRightX()));
 
-    m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
+    // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
     // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
-    m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
-    m_EndEffector.setDefaultCommand(
-        m_EndEffector.setEndEffectorVoltage(() -> buttonBoard.getLeftY() * (0.9 * 12)));
+    // m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
+    // m_EndEffector.setDefaultCommand(
+    //     m_EndEffector.setEndEffectorVoltage(() -> buttonBoard.getLeftY() * (0.9 * 12)));
     // m_Elevator.setDefaultCommand(
     //     PID_FF_Tuners.ElevatorFFTuner(m_Elevator, () -> buttonBoard.getLeftY()));
 
-    // buttonBoard
-    //     .leftBumper()
-    //     .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, LEFT_OFFSET), Set.of(m_Drive)));
-    // buttonBoard
-    //     .rightBumper()
-    //     .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, RIGHT_OFFSET), Set.of(m_Drive)));
+    buttonBoard
+        .leftBumper()
+        .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, LEFT_OFFSET), Set.of(m_Drive)));
+    buttonBoard
+        .rightBumper()
+        .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, RIGHT_OFFSET), Set.of(m_Drive)));
 
-    // buttonBoard
-    //     .a()
-    //     .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE))
-    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
+    buttonBoard
+        .x()
+        .whileTrue(
+            Commands.defer(
+                () ->
+                    Commands.either(
+                        new AlgaeIntake(
+                            m_Elevator,
+                            m_Arm,
+                            m_EndEffector,
+                            ALGAE_PICK2_HEIGHT,
+                            ALGAE_PICK2_ANGLE),
+                        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE)
+                            .andThen(
+                                new HoldPosition(
+                                    m_Elevator,
+                                    m_Arm,
+                                    m_EndEffector,
+                                    L2_HEIGHT_IN,
+                                    TRAVEL_ANGLE,
+                                    0)),
+                        () -> buttonBoard.getHID().getBackButton()),
+                Set.of(m_Elevator, m_Arm, m_EndEffector)))
+        .onFalse(
+            Commands.defer(
+                () ->
+                    Commands.either(
+                        new AlgaeTravelPosition(m_Elevator, m_Arm, m_EndEffector),
+                        new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
+                        () -> buttonBoard.getHID().getBackButton()),
+                Set.of(m_Elevator, m_Arm, m_EndEffector)));
+    ;
 
-    // buttonBoard
-    //     .x()
-    //     .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE))
-    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
+    buttonBoard
+        .a()
+        .whileTrue(
+            Commands.defer(
+                () ->
+                    Commands.either(
+                        new AlgaeScore(
+                            m_Elevator, m_Arm, m_EndEffector, PROCESSOR_HEIGHT, PROCCESOR_ANGLE),
+                        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE)
+                            .andThen(
+                                new HoldPosition(
+                                    m_Elevator,
+                                    m_Arm,
+                                    m_EndEffector,
+                                    L2_HEIGHT_IN,
+                                    TRAVEL_ANGLE,
+                                    0)),
+                        () -> buttonBoard.getHID().getBackButton()),
+                Set.of(m_Elevator, m_Arm, m_EndEffector)))
+        .onFalse(
+            Commands.sequence(
+                m_Elevator
+                    .setElevatorPosition(() -> 40.0)
+                    .until(
+                        () ->
+                            Math.abs(40 - m_Elevator.getLeftElevatorPosition())
+                                < POSITION_TOLERANCE),
+                new TravelPosition(m_Elevator, m_Arm, m_EndEffector)));
 
-    // buttonBoard
-    //     .b()
-    //     .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE))
-    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
+    buttonBoard
+        .b()
+        .whileTrue(
+            Commands.defer(
+                () ->
+                    Commands.either(
+                        new AlgaeIntake(
+                            m_Elevator,
+                            m_Arm,
+                            m_EndEffector,
+                            ALGAE_PICK3_HEIGHT,
+                            ALGAE_PICK3_ANGLE),
+                        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE)
+                            .andThen(
+                                new HoldPosition(
+                                    m_Elevator,
+                                    m_Arm,
+                                    m_EndEffector,
+                                    L2_HEIGHT_IN,
+                                    TRAVEL_ANGLE,
+                                    0)),
+                        () -> buttonBoard.getHID().getBackButton()),
+                Set.of(m_Elevator, m_Arm, m_EndEffector)))
+        .onFalse(
+            Commands.defer(
+                () ->
+                    Commands.either(
+                        new AlgaeTravelPosition(m_Elevator, m_Arm, m_EndEffector),
+                        new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
+                        () -> buttonBoard.getHID().getBackButton()),
+                Set.of(m_Elevator, m_Arm, m_EndEffector)));
 
-    // buttonBoard
-    //     .y()
-    //     .whileTrue(new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE))
-    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
+    buttonBoard
+        .y()
+        .whileTrue(
+            new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE)
+                .andThen(
+                    new HoldPosition(
+                        m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, TRAVEL_ANGLE, 0)))
+        .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
-    // buttonBoard
-    //     .leftStick()
-    //     .whileTrue(new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector))
-    //     .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
+    buttonBoard
+        .leftStick()
+        .whileTrue(
+            new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector)
+                .andThen(
+                    new HoldPosition(
+                        m_Elevator, m_Arm, m_EndEffector, INTAKE_HEIGHT_IN, INTAKE_ANGLE, 0)))
+        .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
     // Lock to 0° when A button is held
     controller
@@ -236,7 +346,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
-    // return new Left3Auton(m_Elevator, m_Arm);
+    m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
+    // return autoChooser.get();
+    return new Left3Auton(m_Elevator, m_Arm, m_EndEffector);
   }
 }

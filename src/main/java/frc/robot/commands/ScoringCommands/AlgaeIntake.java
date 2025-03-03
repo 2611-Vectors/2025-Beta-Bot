@@ -4,7 +4,8 @@
 
 package frc.robot.commands.ScoringCommands;
 
-import static frc.robot.Constants.Setpoints.*;
+import static frc.robot.Constants.Setpoints.ALGAE_INTAKE_SPEED;
+import static frc.robot.Constants.Setpoints.POSITION_TOLERANCE;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -12,8 +13,12 @@ import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Elevator;
 import frc.robot.subsystems.Mechanisms.EndEffector;
 
-public class ScoreSetpoint extends SequentialCommandGroup {
-  public ScoreSetpoint(
+// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
+// information, see:
+// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+public class AlgaeIntake extends SequentialCommandGroup {
+  /** Creates a new AlgaeIntake. */
+  public AlgaeIntake(
       Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, double height, double angle) {
     super(
         m_Elevator
@@ -22,21 +27,10 @@ public class ScoreSetpoint extends SequentialCommandGroup {
                 () -> Math.abs(height - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
         Commands.parallel(
                 m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle))
-            .until(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(angle, m_Arm.getPivotAngle())) < ANGLE_TOLERANCE),
-        m_EndEffector.setEndEffectorVoltage(() -> 2.0),
-        Commands.race(
-            m_Elevator.setElevatorPosition(() -> height),
+            .until(() -> Math.abs(Arm.getRelativeAngle(height, m_Arm.getPivotAngle())) < angle),
+        Commands.parallel(
             m_Arm.setPivotAngle(() -> angle),
-            Commands.waitSeconds(0.2)),
-        Commands.race(
-                m_Elevator.setElevatorPosition(() -> height),
-                m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))
-            .until(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle()))
-                        < ANGLE_TOLERANCE),
-        m_EndEffector.setEndEffectorVoltage(() -> 0.0));
+            m_Elevator.setElevatorPosition(() -> height),
+            m_EndEffector.setEndEffectorVoltage(() -> ALGAE_INTAKE_SPEED)));
   }
 }
