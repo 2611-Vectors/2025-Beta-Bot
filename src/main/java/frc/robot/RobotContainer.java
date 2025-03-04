@@ -256,14 +256,18 @@ public class RobotContainer {
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
-            Commands.sequence(
-                m_Elevator
-                    .setElevatorPosition(() -> 40.0)
-                    .until(
-                        () ->
-                            Math.abs(40 - m_Elevator.getLeftElevatorPosition())
-                                < POSITION_TOLERANCE),
-                new TravelPosition(m_Elevator, m_Arm, m_EndEffector)));
+            Commands.defer(
+                () ->
+                    Commands.either(
+                        m_Elevator
+                            .setElevatorPosition(() -> 40.0)
+                            .until(
+                                () ->
+                                    Math.abs(40 - m_Elevator.getLeftElevatorPosition())
+                                        < POSITION_TOLERANCE),
+                        new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
+                        () -> buttonBoard.getHID().getBackButton()),
+                Set.of(m_Elevator, m_Arm, m_EndEffector)));
 
     buttonBoard
         .b()
@@ -339,6 +343,7 @@ public class RobotContainer {
                     m_Drive)
                 .ignoringDisable(true));
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

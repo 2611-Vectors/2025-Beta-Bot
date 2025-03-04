@@ -163,6 +163,10 @@ public class CustomAutoBuilder {
   }
 
   public static Pose2d applyOffset(Pose2d pose, double lateralOffset) {
+    return applyOffset(pose, lateralOffset, poseAngleMap.get(pose));
+  }
+
+  public static Pose2d applyOffset(Pose2d pose, double lateralOffset, double angle) {
     double reefAngle = Math.toRadians(poseAngleMap.get(pose));
     Translation2d positionOffset =
         new Translation2d(lateralOffset * Math.sin(reefAngle), lateralOffset * Math.cos(reefAngle));
@@ -344,7 +348,7 @@ public class CustomAutoBuilder {
       }
     }
     if (intersectedPlanes.size() == 1) {
-      return getIntersectedPlanes(startPoint, endPoint, reefSize - 0.1);
+      return getIntersectedPlanes(startPoint, endPoint, reefSize - 0.05);
     }
 
     return intersectedPlanes;
