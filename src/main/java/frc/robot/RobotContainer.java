@@ -34,6 +34,7 @@ import frc.robot.commands.ScoringCommands.AlgaeScore;
 import frc.robot.commands.ScoringCommands.AlgaeTravelPosition;
 import frc.robot.commands.ScoringCommands.AlignReef;
 import frc.robot.commands.ScoringCommands.HoldPosition;
+import frc.robot.commands.ScoringCommands.L1Scoring;
 import frc.robot.commands.ScoringCommands.LoadStationIntake;
 import frc.robot.commands.ScoringCommands.ScoreSetpoint;
 import frc.robot.commands.ScoringCommands.TravelPosition;
@@ -244,15 +245,10 @@ public class RobotContainer {
                     Commands.either(
                         new AlgaeScore(
                             m_Elevator, m_Arm, m_EndEffector, PROCESSOR_HEIGHT, PROCCESOR_ANGLE),
-                        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE)
+                        new L1Scoring(m_Elevator, m_Arm, m_EndEffector)
                             .andThen(
                                 new HoldPosition(
-                                    m_Elevator,
-                                    m_Arm,
-                                    m_EndEffector,
-                                    L2_HEIGHT_IN,
-                                    TRAVEL_ANGLE,
-                                    0)),
+                                    m_Elevator, m_Arm, m_EndEffector, 40.0, TRAVEL_ANGLE, 0)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
@@ -264,7 +260,8 @@ public class RobotContainer {
                             .until(
                                 () ->
                                     Math.abs(40 - m_Elevator.getLeftElevatorPosition())
-                                        < POSITION_TOLERANCE),
+                                        < POSITION_TOLERANCE)
+                            .andThen(new TravelPosition(m_Elevator, m_Arm, m_EndEffector)),
                         new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)));
@@ -343,7 +340,6 @@ public class RobotContainer {
                     m_Drive)
                 .ignoringDisable(true));
   }
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.MechanismSimulator;
 import frc.robot.util.MechanismSimulatorActual;
 import frc.robot.util.PhoenixUtil;
 import frc.robot.util.TunablePIDController;
@@ -70,12 +71,12 @@ public class Elevator extends SubsystemBase {
         () -> {
           double targetActual = target.get();
           if (targetActual < STARTING_HEIGHT) {
-            targetActual = STARTING_HEIGHT + HOME_HEIGHT_IN;
+            targetActual = HOME_HEIGHT_IN;
           }
-          // Logger.recordOutput("Elevator/TargetPosition", targetActual);
+          Logger.recordOutput("Elevator/TargetPosition", targetActual);
 
           // // Simulator update
-          // MechanismSimulator.updateElevator(targetActual + 20.33);
+          MechanismSimulator.updateElevator(targetActual);
           // if (!MechanismSimulator.isLegalTarget()) {
           //   double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
           //   targetActual += offset;
@@ -87,8 +88,10 @@ public class Elevator extends SubsystemBase {
             pidPart = 0;
             ffPart = elevatorFF.getKg();
           }
-          setVoltage(
-              MathUtil.clamp(pidPart + ffPart, -ELEVATOR_MAX_VOLTAGE * 0.5, ELEVATOR_MAX_VOLTAGE));
+          Logger.recordOutput(
+              "Elevator/VoltageApplied",
+              MathUtil.clamp(pidPart + ffPart, -1.8, ELEVATOR_MAX_VOLTAGE));
+          setVoltage(MathUtil.clamp(pidPart + ffPart, -1.8, ELEVATOR_MAX_VOLTAGE));
         });
   }
 
@@ -109,7 +112,7 @@ public class Elevator extends SubsystemBase {
     // This method will be called once per scheduler run
     Logger.recordOutput("Elevator/LeftEncoder", getLeftElevatorPosition());
     Logger.recordOutput("Elevator/RightEncoder", getRightElevatorPosition());
-    MechanismSimulatorActual.updateElevator(getLeftElevatorPosition() + 20.33);
+    MechanismSimulatorActual.updateElevator(getLeftElevatorPosition());
     elevatorPID.update();
   }
 }

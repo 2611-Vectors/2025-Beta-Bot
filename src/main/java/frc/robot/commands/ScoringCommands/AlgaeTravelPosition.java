@@ -5,6 +5,7 @@
 package frc.robot.commands.ScoringCommands;
 
 import static frc.robot.Constants.Setpoints.ALGAE_INTAKE_SPEED;
+import static frc.robot.Constants.Setpoints.ANGLE_TOLERANCE;
 import static frc.robot.Constants.Setpoints.POSITION_TOLERANCE;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -25,13 +26,14 @@ public class AlgaeTravelPosition extends SequentialCommandGroup {
         m_EndEffector.setEndEffectorVoltage(() -> ALGAE_INTAKE_SPEED),
         m_Elevator
             .setElevatorPosition(() -> 40.0)
-            .until(() -> Math.abs(40 - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+            .until(
+                () -> Math.abs(40.0 - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
         m_Arm
             .setPivotAngle(() -> PROCCESOR_ANGLE)
             .until(
                 () ->
                     Math.abs(Arm.getRelativeAngle(PROCCESOR_ANGLE, m_Arm.getPivotAngle()))
-                        < PROCCESOR_ANGLE),
+                        < ANGLE_TOLERANCE),
         Commands.parallel(
             m_Arm.setPivotAngle(() -> PROCCESOR_ANGLE),
             m_Elevator.setElevatorPosition(() -> PROCESSOR_HEIGHT)));

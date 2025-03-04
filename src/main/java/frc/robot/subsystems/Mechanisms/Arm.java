@@ -111,12 +111,7 @@ public class Arm extends SubsystemBase {
           MechanismSimulator.updateArm(angle.get());
 
           double pidPart;
-          if (!MechanismSimulator.isLegalTarget()) {
-            pidPart = armPID.calculate(getPivotAngle(), HOME_ANGLE);
-          } else {
-            pidPart = armPID.calculate(getPivotAngle(), angle.get());
-          }
-
+          pidPart = armPID.calculate(getPivotAngle(), angle.get());
           double ffPart = 0; // armFF.getKg() * Math.cos(Math.toRadians(getPivotAngle()));
           arm.setVoltage(MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE));
         });

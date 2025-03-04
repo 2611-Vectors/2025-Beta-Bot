@@ -54,8 +54,8 @@ public class PhoenixUtil {
         inverted ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive;
 
     // Peak output of 8 V
-    configs.Voltage.PeakForwardVoltage = 10;
-    configs.Voltage.PeakReverseVoltage = -10;
+    configs.Voltage.PeakForwardVoltage = 12;
+    configs.Voltage.PeakReverseVoltage = -12;
 
     configs.CurrentLimits.StatorCurrentLimit = 60;
     configs.CurrentLimits.StatorCurrentLimitEnable = true;
