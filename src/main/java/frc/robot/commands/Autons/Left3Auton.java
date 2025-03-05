@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.ScoringCommands.LoadStationIntake;
-import frc.robot.commands.ScoringCommands.ScoreSetpoint;
 import frc.robot.commands.ScoringCommands.TravelPosition;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Elevator;
@@ -25,8 +24,11 @@ public class Left3Auton extends SequentialCommandGroup {
     Command[] drivePaths = CustomAutoBuilder.getDrivePaths();
 
     addCommands(
+        // Commands.race(
         drivePaths[0],
-        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
+        // Commands.sequence(
+        //     new WaitCommand(0.25), m_Elevator.setElevatorPosition(() -> L4_HEIGHT_IN))),
+        AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
         scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[1], drivePaths[2]),
         scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[3], drivePaths[4]),
         new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
@@ -43,9 +45,44 @@ public class Left3Auton extends SequentialCommandGroup {
             drivePath1,
             Commands.sequence(
                 new WaitCommand(0.25), new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector))),
+        // Commands.race(
+        drivePath2,
+        // Commands.sequence(
+        //     new WaitCommand(0.5),
+        //     new HoldPosition(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, -60, 0.0))),
+        m_Arm
+            .setPivotAngle(() -> L4_ANGLE * 2)
+            .until(
+                () ->
+                    Math.abs(Arm.getRelativeAngle(L4_ANGLE * 2, m_Arm.getPivotAngle()))
+                        < ANGLE_TOLERANCE),
+        AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE));
+  }
+
+  private Command AutoScoreSetpoint(
+      Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, double height, double angle) {
+    return Commands.sequence(
+        m_Elevator
+            .setElevatorPosition(() -> height)
+            .until(
+                () -> Math.abs(height - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+        Commands.parallel(
+                m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle))
+            .until(
+                () ->
+                    Math.abs(Arm.getRelativeAngle(angle, m_Arm.getPivotAngle())) < ANGLE_TOLERANCE),
+        m_EndEffector.setEndEffectorVoltage(() -> 6.0),
         Commands.race(
-            drivePath2,
-            Commands.sequence(new WaitCommand(1), m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))),
-        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE));
+            m_Elevator.setElevatorPosition(() -> height),
+            m_Arm.setPivotAngle(() -> angle),
+            Commands.waitSeconds(0.25)),
+        Commands.race(
+                m_Elevator.setElevatorPosition(() -> height),
+                m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))
+            .until(
+                () ->
+                    Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle()))
+                        < ANGLE_TOLERANCE),
+        m_EndEffector.setEndEffectorVoltage(() -> 0.0));
   }
 }

@@ -123,7 +123,10 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
+    // CommandScheduler.getInstance().removeAll(Set.of(CommandScheduler.getInstance().disable()));
+  }
 
   /** This function is called periodically when disabled. */
   @Override
@@ -166,7 +169,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during test mode. */

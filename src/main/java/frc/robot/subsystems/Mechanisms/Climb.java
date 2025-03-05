@@ -32,12 +32,18 @@ public class Climb extends SubsystemBase {
     grabMotor.setVoltage(voltage);
   }
 
-  public Command runWinch(Supplier<Double> leftPower, Supplier<Double> rightPower) {
-    return Commands.run(() -> setWinchVoltage((leftPower.get() - rightPower.get()) * 5));
+  public Command runWinch(Supplier<Double> power) {
+    return run(
+        () -> {
+          if (Math.abs(power.get()) > 0.1) setWinchVoltage(power.get() * 12);
+          else {
+            setWinchVoltage(0);
+          }
+        });
   }
 
   public Command runGrab(Supplier<Double> power) {
-    return Commands.run(() -> setGrabVoltage(power.get() * 12));
+    return Commands.runOnce(() -> setGrabVoltage(power.get() * 8));
   }
 
   @Override

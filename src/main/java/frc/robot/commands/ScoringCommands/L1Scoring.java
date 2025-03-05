@@ -49,7 +49,7 @@ public class L1Scoring extends SequentialCommandGroup {
         Commands.race(
             m_Elevator.setElevatorPosition(() -> L2_HEIGHT_IN),
             m_Arm.setPivotAngle(() -> L2_ANGLE),
-            Commands.waitSeconds(0.2)),
+            Commands.waitSeconds(0.5)),
         Commands.race(
             m_Elevator
                 .setElevatorPosition(() -> 40.0)

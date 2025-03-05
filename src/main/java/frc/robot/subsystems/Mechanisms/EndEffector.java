@@ -19,7 +19,7 @@ public class EndEffector extends SubsystemBase {
 
   /** Creates a new EndEffector. */
   public EndEffector() {
-    PhoenixUtil.configMotor(endEffector, false, NeutralModeValue.Coast);
+    PhoenixUtil.configMotorElevator(endEffector, false, NeutralModeValue.Coast, 60);
   }
 
   public Command setEndEffectorVoltage(Supplier<Double> voltage) {

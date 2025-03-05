@@ -163,10 +163,6 @@ public class CustomAutoBuilder {
   }
 
   public static Pose2d applyOffset(Pose2d pose, double lateralOffset) {
-    return applyOffset(pose, lateralOffset, poseAngleMap.get(pose));
-  }
-
-  public static Pose2d applyOffset(Pose2d pose, double lateralOffset, double angle) {
     double reefAngle = Math.toRadians(poseAngleMap.get(pose));
     Translation2d positionOffset =
         new Translation2d(lateralOffset * Math.sin(reefAngle), lateralOffset * Math.cos(reefAngle));
@@ -210,7 +206,7 @@ public class CustomAutoBuilder {
     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
       return new Pose2d(
           startPath.flipPath().getPathPoses().get(0).getTranslation(),
-          START_ROTATION.rotateBy(Rotation2d.fromDegrees(180)));
+          startChooser.get().getRotation().rotateBy(Rotation2d.fromDegrees(180)));
     }
     return startChooser.get();
   }

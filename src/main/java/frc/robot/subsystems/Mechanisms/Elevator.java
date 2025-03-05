@@ -36,8 +36,8 @@ public class Elevator extends SubsystemBase {
     leftMotor = new TalonFX(LEFT_ELEVATOR_ID);
     rightMotor = new TalonFX(RIGHT_ELEVATOR_ID);
 
-    PhoenixUtil.configMotor(leftMotor, true, NeutralModeValue.Brake);
-    PhoenixUtil.configMotor(rightMotor, false, NeutralModeValue.Brake);
+    PhoenixUtil.configMotorElevator(leftMotor, true, NeutralModeValue.Brake, 70);
+    PhoenixUtil.configMotorElevator(rightMotor, false, NeutralModeValue.Brake, 70);
 
     housingDiamter = new LoggedNetworkNumber("/Elevator/Housing Diameter", STRING_HOUSING_DIAMETER);
   }

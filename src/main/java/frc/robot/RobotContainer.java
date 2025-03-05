@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autons.Left3Auton;
@@ -197,12 +198,34 @@ public class RobotContainer {
     // m_Elevator.setDefaultCommand(
     //     PID_FF_Tuners.ElevatorFFTuner(m_Elevator, () -> buttonBoard.getLeftY()));
 
+    // CLIMB CONTROLS
+    // new Trigger(() -> buttonBoard.getRightY() > -0.6)
+    //     .whileTrue(m_Climb.runGrab(() -> 8.0))
+    //     .onFalse(m_Climb.runGrab(() -> 0d));
+    buttonBoard.start().whileTrue(m_Climb.runGrab(() -> -1.0)).onFalse(m_Climb.runGrab(() -> 0.0));
+    // new Trigger(() -> buttonBoard.getRightY() < 0.6)
+    //     .whileTrue(m_Climb.runWinch(() -> 0.5))
+    //     .onFalse(m_Climb.runWinch(() -> 0d));
+    m_Climb.setDefaultCommand(m_Climb.runWinch(() -> buttonBoard.getRightY()));
+
     buttonBoard
-        .leftBumper()
+        .leftTrigger(0.8)
+        .and(() -> controller.getHID().getLeftBumperButton())
         .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, LEFT_OFFSET), Set.of(m_Drive)));
     buttonBoard
-        .rightBumper()
+        .rightTrigger(0.8)
+        .and(() -> controller.getHID().getLeftBumperButton())
         .whileTrue(Commands.defer(() -> new AlignReef(m_Drive, RIGHT_OFFSET), Set.of(m_Drive)));
+
+    buttonBoard
+        .leftBumper()
+        .whileTrue(m_EndEffector.setEndEffectorVoltage(() -> 6d))
+        .onFalse(m_EndEffector.setEndEffectorVoltage(() -> 0d));
+
+    buttonBoard
+        .rightBumper()
+        .whileTrue(m_EndEffector.setEndEffectorVoltage(() -> -12d))
+        .onFalse(m_EndEffector.setEndEffectorVoltage(() -> 0d));
 
     buttonBoard
         .x()
@@ -235,7 +258,6 @@ public class RobotContainer {
                         new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)));
-    ;
 
     buttonBoard
         .a()
@@ -284,7 +306,7 @@ public class RobotContainer {
                                     m_Elevator,
                                     m_Arm,
                                     m_EndEffector,
-                                    L2_HEIGHT_IN,
+                                    L3_HEIGHT_IN,
                                     TRAVEL_ANGLE,
                                     0)),
                         () -> buttonBoard.getHID().getBackButton()),
@@ -307,8 +329,7 @@ public class RobotContainer {
                         m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, TRAVEL_ANGLE, 0)))
         .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
-    buttonBoard
-        .leftStick()
+    new Trigger(() -> buttonBoard.getLeftY() > 0.6)
         .whileTrue(
             new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector)
                 .andThen(
@@ -327,7 +348,7 @@ public class RobotContainer {
                 () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(m_Drive::stopWithX, m_Drive));
+    controller.rightBumper().onTrue(Commands.runOnce(m_Drive::stopWithX, m_Drive));
 
     // Reset gyro to 0° when Back button is pressed
     controller

@@ -46,8 +46,8 @@ public final class Constants {
   }
 
   public static class Climb {
-    public static final int CLIMB_WINCH_ID = 51;
-    public static final int CLIMB_GRAB_ID = 52;
+    public static final int CLIMB_WINCH_ID = 52;
+    public static final int CLIMB_GRAB_ID = 51;
   }
 
   public static class ArmConstants {
@@ -114,11 +114,9 @@ public final class Constants {
   public static class AutonConstants {
     public static final int NUMBER_OF_CHOOSERS = 3;
 
-    public static final Rotation2d START_ROTATION = Rotation2d.fromDegrees(0);
-
-    public static final Pose2d START_LEFT = new Pose2d(7.200, 6.175, Rotation2d.fromDegrees(60));
-    public static final Pose2d START_CENTER = new Pose2d(7.200, 4.000, START_ROTATION);
-    public static final Pose2d START_RIGHT = new Pose2d(7.200, 1.900, START_ROTATION);
+    public static final Pose2d START_LEFT = new Pose2d(6.8, 6.0, Rotation2d.fromDegrees(60));
+    public static final Pose2d START_CENTER = new Pose2d(7.200, 4.000, Rotation2d.fromDegrees(0));
+    public static final Pose2d START_RIGHT = new Pose2d(7.200, 1.900, Rotation2d.fromDegrees(-60));
 
     public static final Pose2d AB = new Pose2d(3.2512, 4.0259, Rotation2d.fromDegrees(180));
     public static final Pose2d CD = new Pose2d(3.8707, 2.9543, Rotation2d.fromDegrees(-120));
@@ -145,7 +143,7 @@ public final class Constants {
     }
 
     public static final double MAX_VELOCITY = 4.00; // 5.1
-    public static final double MAX_ACCELERATION = 1.9; // 2.9
+    public static final double MAX_ACCELERATION = 2.1; // 2.9
   }
 
   public static class VisionConstants {
@@ -161,9 +159,9 @@ public final class Constants {
     // Position of the PhotonVision Reef Camera
     public static Transform3d robotToBackRightCam =
         new Transform3d(
-          Units.inchesToMeters(-5.125),
-          Units.inchesToMeters(-4.125),
-          Units.inchesToMeters(8.625),
+            Units.inchesToMeters(-5.125),
+            Units.inchesToMeters(-4.125),
+            Units.inchesToMeters(8.625),
             new Rotation3d(0.0, Math.toRadians(0), Math.toRadians(180)));
 
     public static String BackLeftCam = "BackLeftCam";
