@@ -50,12 +50,6 @@ public class Left3Auton extends SequentialCommandGroup {
         // Commands.sequence(
         //     new WaitCommand(0.5),
         //     new HoldPosition(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, -60, 0.0))),
-        m_Arm
-            .setPivotAngle(() -> L4_ANGLE * 2)
-            .until(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(L4_ANGLE * 2, m_Arm.getPivotAngle()))
-                        < ANGLE_TOLERANCE),
         AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE));
   }
 
@@ -66,6 +60,9 @@ public class Left3Auton extends SequentialCommandGroup {
             .setElevatorPosition(() -> height)
             .until(
                 () -> Math.abs(height - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+        Commands.parallel(
+                m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle * 2))
+            .until(() -> Math.abs(Arm.getRelativeAngle(angle * 2, m_Arm.getPivotAngle())) < 10),
         Commands.parallel(
                 m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle))
             .until(

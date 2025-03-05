@@ -33,8 +33,8 @@ public class LoadStationIntake extends SequentialCommandGroup {
             m_Elevator.setElevatorPosition(() -> INTAKE_HEIGHT_IN),
             Commands.sequence(
                 m_EndEffector.setEndEffectorVoltage(() -> -6.0),
-                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) > 40),
-                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) < 28),
+                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) > 44),
+                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) < 32),
                 m_EndEffector.setEndEffectorVoltage(() -> 0.0))));
   }
 }
