@@ -91,7 +91,7 @@ public final class Constants {
     public static final double L3_HEIGHT_IN = 40.0;
     public static final double L4_HEIGHT_IN = 67.0;
     public static final double INTAKE_HEIGHT_IN = 53.25;
-    public static double ALGAE_PICK2_HEIGHT = 48.0;
+    public static double ALGAE_PICK2_HEIGHT = 32.0;
     public static double ALGAE_PICK3_HEIGHT = 48.0;
     public static double PROCESSOR_HEIGHT = 27.0;
 

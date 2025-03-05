@@ -5,7 +5,9 @@
 package frc.robot.commands.ScoringCommands;
 
 import static frc.robot.Constants.Setpoints.ALGAE_INTAKE_SPEED;
+import static frc.robot.Constants.Setpoints.PROCCESOR_ANGLE;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Elevator;
@@ -18,6 +20,9 @@ public class AlgaeScore extends SequentialCommandGroup {
   /** Creates a new AlgaeScore. */
   public AlgaeScore(
       Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, double height, double angle) {
-    super(m_EndEffector.setEndEffectorVoltage(() -> -ALGAE_INTAKE_SPEED));
+    super(
+        Commands.parallel(
+            m_EndEffector.setEndEffectorVoltage(() -> -ALGAE_INTAKE_SPEED),
+            m_Arm.setPivotAngle(() -> PROCCESOR_ANGLE)));
   }
 }
