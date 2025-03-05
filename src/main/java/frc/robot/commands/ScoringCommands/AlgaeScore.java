@@ -4,6 +4,7 @@
 
 package frc.robot.commands.ScoringCommands;
 
+import static frc.robot.Constants.Setpoints.*;
 import static frc.robot.Constants.Setpoints.ALGAE_INTAKE_SPEED;
 import static frc.robot.Constants.Setpoints.PROCCESOR_ANGLE;
 
@@ -20,9 +21,14 @@ public class AlgaeScore extends SequentialCommandGroup {
   /** Creates a new AlgaeScore. */
   public AlgaeScore(
       Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, double height, double angle) {
-    super(
+    addCommands(
         Commands.parallel(
-            m_EndEffector.setEndEffectorVoltage(() -> -ALGAE_INTAKE_SPEED),
-            m_Arm.setPivotAngle(() -> PROCCESOR_ANGLE)));
+                m_Elevator.setElevatorPosition(() -> PROCESSOR_HEIGHT),
+                m_EndEffector.setEndEffectorVoltage(() -> -ALGAE_INTAKE_SPEED),
+                m_Arm.setPivotAngle(() -> PROCCESOR_ANGLE))
+            .onlyIf(
+                () ->
+                    Math.abs(Arm.getRelativeAngle(PROCCESOR_ANGLE, m_Arm.getPivotAngle())) < 20
+                        && m_Elevator.getLeftElevatorPosition() < 30.0));
   }
 }

@@ -40,6 +40,7 @@ import frc.robot.commands.ScoringCommands.L1Scoring;
 import frc.robot.commands.ScoringCommands.LoadStationIntake;
 import frc.robot.commands.ScoringCommands.ScoreSetpoint;
 import frc.robot.commands.ScoringCommands.TravelPosition;
+import frc.robot.commands.ScoringCommands.setElevatorHeight;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Climb;
@@ -178,9 +179,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private final SlewRateLimiter slewRateX = new SlewRateLimiter(1);
+  private final SlewRateLimiter slewRateX = new SlewRateLimiter(1.1);
 
-  private final SlewRateLimiter slewRateY = new SlewRateLimiter(1);
+  private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.1);
 
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
@@ -224,7 +225,7 @@ public class RobotContainer {
 
     buttonBoard
         .rightBumper()
-        .whileTrue(m_EndEffector.setEndEffectorVoltage(() -> -12d))
+        .whileTrue(m_EndEffector.setEndEffectorVoltage(() -> -6d))
         .onFalse(m_EndEffector.setEndEffectorVoltage(() -> 0d));
 
     buttonBoard
@@ -277,12 +278,7 @@ public class RobotContainer {
             Commands.defer(
                 () ->
                     Commands.either(
-                        m_Elevator
-                            .setElevatorPosition(() -> 40.0)
-                            .until(
-                                () ->
-                                    Math.abs(40 - m_Elevator.getLeftElevatorPosition())
-                                        < POSITION_TOLERANCE)
+                        new setElevatorHeight(m_Elevator, m_Arm, () -> 40d)
                             .andThen(new TravelPosition(m_Elevator, m_Arm, m_EndEffector)),
                         new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         () -> buttonBoard.getHID().getBackButton()),

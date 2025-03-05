@@ -18,9 +18,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class AlignReef extends SequentialCommandGroup {
   private static TunablePIDController drivePID_X =
-      new TunablePIDController(2.5, 0, 0.2, "/tuning/driveX/");
+      new TunablePIDController(2.75, 0, 0.2, "/tuning/driveX/");
   private static TunablePIDController drivePID_Y =
-      new TunablePIDController(2.5, 0, 0.2, "tuning/driveY/");
+      new TunablePIDController(2.75, 0, 0.2, "tuning/driveY/");
 
   private static Pose2d getClosestPoint(Pose2d curPose) {
     Pose2d closestPoint = new Pose2d();
