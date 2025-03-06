@@ -22,12 +22,12 @@ public class EndEffector extends SubsystemBase {
     PhoenixUtil.configMotorElevator(endEffector, false, NeutralModeValue.Coast, 60);
   }
 
+  public void setVoltage(double voltage) {
+    endEffector.setVoltage(voltage);
+  }
+
   public Command setEndEffectorVoltage(Supplier<Double> voltage) {
-    return runOnce(
-        () -> {
-          endEffector.setVoltage(voltage.get());
-          Logger.recordOutput("/EndEffector/EndEffectorVoltage", voltage.get());
-        });
+    return runOnce(() -> endEffector.setVoltage(voltage.get()));
   }
 
   public double getEndEffectorRPS() {

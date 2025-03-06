@@ -152,6 +152,8 @@ public final class Constants {
         AprilTagFieldLayout.loadField(
             AprilTagFields
                 .k2025ReefscapeAndyMark); // I think we need to change this to welded for comp
+    public static final double FIELD_WIDTH = 17.548;
+    public static final double FIELD_HEIGHT = 8.042;
 
     // Name of the PhotonVision Reef Camera
     public static String BackRightCam = "BackRightCam";
@@ -194,7 +196,7 @@ public final class Constants {
             new Rotation3d(0.0, Math.toRadians(-20), Math.toRadians(160)));
 
     // Basic filtering thresholds
-    public static double maxAmbiguity = 0.1;
+    public static double maxAmbiguity = 0.2;
     public static double maxZError = 0.2;
 
     // Standard deviation baselines, for 1 meter distance and 1 tag

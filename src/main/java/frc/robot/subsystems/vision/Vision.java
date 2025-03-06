@@ -76,7 +76,8 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
-  LoggedNetworkNumber ambiguity = new LoggedNetworkNumber("Vision/Tuning/Ambiguity", 0.3);
+  LoggedNetworkNumber ambiguity =
+      new LoggedNetworkNumber("Vision/Tuning/Ambiguity", Constants.VisionConstants.maxAmbiguity);
   LoggedNetworkNumber zError = new LoggedNetworkNumber("Vision/Tuning/zError", 0.2);
 
   @Override

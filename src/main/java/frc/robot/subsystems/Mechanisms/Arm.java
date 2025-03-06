@@ -10,6 +10,7 @@ import static frc.robot.Constants.Setpoints.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,7 +28,8 @@ public class Arm extends SubsystemBase {
   DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(ARM_ENCODER_PORT);
   TunablePIDController armPID = new TunablePIDController(0.2, 0.0, 0.0, "/Testing/ArmPID/");
 
-  // public final ArmFeedforward armFF = new ArmFeedforward(0.0, 0.5, 0.0);
+  public final ArmFeedforward armFF = new ArmFeedforward(0.0, 0.0, 0.0);
+  LoggedNetworkNumber armKg;
 
   // This is temp
   LoggedNetworkNumber algaeProccesor_h,
@@ -42,7 +44,6 @@ public class Arm extends SubsystemBase {
   public Arm() {
     PhoenixUtil.configMotor(arm, false, NeutralModeValue.Brake);
     armPID.enableContinuousInput(-180, 180);
-
     // This is temp
     algaeProccesor_h =
         new LoggedNetworkNumber("SetpointTuning/Proccessor Height", PROCESSOR_HEIGHT);
@@ -54,6 +55,8 @@ public class Arm extends SubsystemBase {
     algaeP3_h = new LoggedNetworkNumber("SetpointTuning/Algae Pick 3 Height", ALGAE_PICK3_HEIGHT);
     algaeP3_a = new LoggedNetworkNumber("SetpointTuning/Algae Pick 3 Angle", ALGAE_PICK3_ANGLE);
     algaeSpeed = new LoggedNetworkNumber("SetpointTunning/AlgaeSpeed", ALGAE_INTAKE_SPEED);
+
+    armKg = new LoggedNetworkNumber("Arm/Arm kG", 0.0);
   }
 
   /** Function for voltage control for arm motor */
@@ -89,6 +92,8 @@ public class Arm extends SubsystemBase {
   /** Function to calculate the relative distance between two angles */
   public static double getRelativeAngle(double angle1, double angle2) {
     double difference = (angle2 - angle1 + 180) % 360 - 180;
+    Logger.recordOutput(
+        "Angle/Arm Relative Angle", difference < -180 ? difference + 360 : difference);
     return difference < -180 ? difference + 360 : difference;
   }
 
@@ -112,7 +117,9 @@ public class Arm extends SubsystemBase {
 
           double pidPart;
           pidPart = armPID.calculate(getPivotAngle(), angle.get());
-          double ffPart = 0; // armFF.getKg() * Math.cos(Math.toRadians(getPivotAngle()));
+          double ffPart =
+              armFF.getKg() * Math.cos(Math.toRadians(getPivotAngle())); // armFF.getKg() *
+          // Math.cos(Math.toRadians(getPivotAngle()));
           arm.setVoltage(MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE));
         });
   }
@@ -135,5 +142,7 @@ public class Arm extends SubsystemBase {
     ALGAE_PICK3_HEIGHT = algaeP3_h.get();
 
     ALGAE_INTAKE_SPEED = algaeSpeed.get();
+
+    armFF.setKg(armKg.get());
   }
 }

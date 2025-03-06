@@ -180,7 +180,7 @@ public class CustomAutoBuilder {
 
   public static PathPlannerPath getPathFromPoints(Pose2d point1, Pose2d point2) {
     PathConstraints constraints =
-        new PathConstraints(MAX_VELOCITY, MAX_ACCELERATION, Math.PI, 2 * Math.PI);
+        new PathConstraints(MAX_VELOCITY, MAX_ACCELERATION, 2 * Math.PI, 4 * Math.PI);
     List<Waypoint> waypoints = generateWaypoints(point1.getTranslation(), point2.getTranslation());
     return new PathPlannerPath(
         waypoints,
@@ -191,6 +191,31 @@ public class CustomAutoBuilder {
         constraints,
         new IdealStartingState(
             0.0,
+            point1
+                .getRotation()), // The ideal starting state, this is only relevant for pre-planned
+        // paths, so can
+        // be null for on-the-fly paths.
+        new GoalEndState(
+            0.0, point2.getRotation()), // Goal end state. You can set a holonomic rotation here. If
+        // using a differential drivetrain, the rotation will have no
+        // effect.
+        false);
+  }
+
+  public static PathPlannerPath getPathFromPoints(
+      Pose2d point1, Pose2d point2, double startVelocity) {
+    PathConstraints constraints =
+        new PathConstraints(MAX_VELOCITY, MAX_ACCELERATION, Math.PI, 2 * Math.PI);
+    List<Waypoint> waypoints = generateWaypoints(point1.getTranslation(), point2.getTranslation());
+    return new PathPlannerPath(
+        waypoints,
+        new ArrayList<>(),
+        new ArrayList<>(),
+        new ArrayList<>(),
+        new ArrayList<>(),
+        constraints,
+        new IdealStartingState(
+            startVelocity,
             point1
                 .getRotation()), // The ideal starting state, this is only relevant for pre-planned
         // paths, so can

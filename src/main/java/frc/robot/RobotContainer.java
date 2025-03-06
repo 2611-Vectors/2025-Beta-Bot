@@ -220,12 +220,20 @@ public class RobotContainer {
 
     buttonBoard
         .leftBumper()
-        .whileTrue(m_EndEffector.setEndEffectorVoltage(() -> 6d))
+        .whileTrue(
+            Commands.parallel(
+                m_EndEffector.setEndEffectorVoltage(() -> 6d),
+                m_Arm.setArmVoltage(() -> 0d),
+                m_Elevator.holdElevator()))
         .onFalse(m_EndEffector.setEndEffectorVoltage(() -> 0d));
 
     buttonBoard
         .rightBumper()
-        .whileTrue(m_EndEffector.setEndEffectorVoltage(() -> -6d))
+        .whileTrue(
+            Commands.parallel(
+                m_EndEffector.setEndEffectorVoltage(() -> -6d),
+                m_Arm.setArmVoltage(() -> 0d),
+                m_Elevator.holdElevator()))
         .onFalse(m_EndEffector.setEndEffectorVoltage(() -> 0d));
 
     buttonBoard
@@ -279,7 +287,8 @@ public class RobotContainer {
                 () ->
                     Commands.either(
                         new setElevatorHeight(m_Elevator, m_Arm, () -> 40d)
-                            .andThen(new TravelPosition(m_Elevator, m_Arm, m_EndEffector)),
+                            .andThen(new TravelPosition(m_Elevator, m_Arm, m_EndEffector))
+                            .onlyIf(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) > 2),
                         new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)));
@@ -342,13 +351,21 @@ public class RobotContainer {
             Commands.run(() -> SmartDashboard.putBoolean("Manual Mode", manualMode))
                 .ignoringDisable(true));
 
-    new Trigger(() -> manualMode)
-        .whileTrue(
-            Commands.parallel(
-                m_Arm.setArmVoltage(() -> buttonBoard.getRightY()),
-                m_Elevator.setVoltage(
-                    () -> -buttonBoard.getLeftY() + m_Elevator.elevatorFF.getKg())));
-    // .whileFalse(m_Climb.runWinch(() -> buttonBoard.getRightY()));
+    controller
+        .rightTrigger(0.8)
+        .onTrue(Commands.runOnce(() -> manualMode = !manualMode).ignoringDisable(true))
+        .onChange(
+            Commands.run(() -> SmartDashboard.putBoolean("Manual Mode", manualMode))
+                .ignoringDisable(true));
+
+    // new Trigger(() -> manualMode)
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             m_Arm.setArmVoltage(() -> buttonBoard.getRightY()),
+    //             m_Elevator.setVoltage(
+    //                 () -> -buttonBoard.getLeftY() + m_Elevator.elevatorFF.getKg())))
+    //     .whileFalse
+    m_Climb.setDefaultCommand(m_Climb.runWinch(() -> buttonBoard.getRightY()));
 
     // Lock to 0° when A button is held
     controller
@@ -384,5 +401,13 @@ public class RobotContainer {
     m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
     return new Left3Auton(m_Elevator, m_Arm, m_EndEffector);
+  }
+
+  public void zeroMotors() {
+    m_Elevator.setVoltage(0);
+    m_Arm.setArmVoltage(0);
+    m_EndEffector.setVoltage(0);
+    m_Climb.setWinchVoltage(0);
+    m_Climb.setGrabVoltage(0);
   }
 }

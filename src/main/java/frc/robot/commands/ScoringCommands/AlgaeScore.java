@@ -5,8 +5,6 @@
 package frc.robot.commands.ScoringCommands;
 
 import static frc.robot.Constants.Setpoints.*;
-import static frc.robot.Constants.Setpoints.ALGAE_INTAKE_SPEED;
-import static frc.robot.Constants.Setpoints.PROCCESOR_ANGLE;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -22,13 +20,31 @@ public class AlgaeScore extends SequentialCommandGroup {
   public AlgaeScore(
       Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, double height, double angle) {
     addCommands(
-        Commands.parallel(
-                m_Elevator.setElevatorPosition(() -> PROCESSOR_HEIGHT),
-                m_EndEffector.setEndEffectorVoltage(() -> -ALGAE_INTAKE_SPEED),
-                m_Arm.setPivotAngle(() -> PROCCESOR_ANGLE))
+        Commands.race(
+                m_Arm.setArmVoltage(() -> 0d),
+                m_Elevator
+                    .setElevatorPosition(() -> 35.0)
+                    .until(() -> m_Elevator.getLeftElevatorPosition() > 30.0))
             .onlyIf(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(PROCCESOR_ANGLE, m_Arm.getPivotAngle())) < 20
-                        && m_Elevator.getLeftElevatorPosition() < 30.0));
+                () -> Math.abs(Arm.getRelativeAngle(PROCCESOR_ANGLE, m_Arm.getPivotAngle())) > 10),
+        Commands.race(
+            m_Arm
+                .setPivotAngle(() -> PROCCESOR_ANGLE)
+                .until(
+                    () ->
+                        Math.abs(Arm.getRelativeAngle(PROCCESOR_ANGLE, m_Arm.getPivotAngle()))
+                            < ANGLE_TOLERANCE),
+            m_Elevator.holdElevator()),
+        Commands.race(
+            m_Elevator
+                .setElevatorPosition(() -> PROCESSOR_HEIGHT)
+                .until(
+                    () ->
+                        Math.abs(PROCESSOR_HEIGHT - m_Elevator.getLeftElevatorPosition())
+                            < POSITION_TOLERANCE),
+            m_Arm.setPivotAngle(() -> PROCCESOR_ANGLE)),
+        Commands.parallel(
+            new HoldPosition(m_Elevator, m_Arm, m_EndEffector, height, angle, -ALGAE_INTAKE_SPEED)),
+        m_EndEffector.setEndEffectorVoltage(() -> -ALGAE_INTAKE_SPEED));
   }
 }

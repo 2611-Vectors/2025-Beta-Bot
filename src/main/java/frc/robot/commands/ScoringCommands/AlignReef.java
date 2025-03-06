@@ -5,12 +5,17 @@
 package frc.robot.commands.ScoringCommands;
 
 import static frc.robot.Constants.AutonConstants.*;
+import static frc.robot.Constants.VisionConstants.FIELD_HEIGHT;
+import static frc.robot.Constants.VisionConstants.FIELD_WIDTH;
 
-import edu.wpi.first.math.MathUtil;
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.CustomAutoBuilder;
 import frc.robot.util.TunablePIDController;
@@ -38,9 +43,22 @@ public class AlignReef extends SequentialCommandGroup {
 
   /** Creates a new AlignReef. */
   public AlignReef(Drive m_Drive, double reefSide) {
-    Pose2d closestPoint = getClosestPoint(m_Drive.getPose());
-    Pose2d targetPos = CustomAutoBuilder.applyOffset(closestPoint, reefSide);
+    Pose2d startPoint = m_Drive.getPose();
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+      startPoint =
+          (new Pose2d(
+              FIELD_WIDTH - startPoint.getX(),
+              FIELD_HEIGHT - startPoint.getY(),
+              Rotation2d.fromDegrees(Arm.flipAngle(startPoint.getRotation().getDegrees()))));
+    }
+    System.out.println("--------");
+    System.out.println(FIELD_WIDTH - startPoint.getX());
+    System.out.println(FIELD_HEIGHT - startPoint.getY());
+    System.out.println(m_Drive.getPose());
+    System.out.println("--------");
 
+    Pose2d closestPoint = getClosestPoint(startPoint);
+    Pose2d targetPos = CustomAutoBuilder.applyOffset(closestPoint, reefSide);
     addCommands(
         Commands.parallel(
             Commands.run(
@@ -49,14 +67,7 @@ public class AlignReef extends SequentialCommandGroup {
                   drivePID_Y.update();
                   Logger.recordOutput("/targetPosition", targetPos);
                 }),
-            DriveCommands.joystickDriveAtAngle(
-                m_Drive,
-                () ->
-                    MathUtil.clamp(
-                        drivePID_X.calculate(m_Drive.getPose().getX(), targetPos.getX()), -.5, .5),
-                () ->
-                    MathUtil.clamp(
-                        drivePID_Y.calculate(m_Drive.getPose().getY(), targetPos.getY()), -.5, .5),
-                () -> closestPoint.getRotation())));
+            AutoBuilder.followPath(
+                CustomAutoBuilder.getPathFromPoints(startPoint, targetPos, 2.0))));
   }
 }
