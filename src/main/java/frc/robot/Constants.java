@@ -142,8 +142,8 @@ public final class Constants {
       poseAngleMap.put(KL, -300.0);
     }
 
-    public static final double MAX_VELOCITY = 4.00; // 5.1
-    public static final double MAX_ACCELERATION = 2.1; // 2.9
+    public static final double MAX_VELOCITY = 4.0;//5.00; // Change back to 4 // 5.1
+    public static final double MAX_ACCELERATION = 2.1;//2.5; // Change back to 2.1 // 2.9
   }
 
   public static class VisionConstants {

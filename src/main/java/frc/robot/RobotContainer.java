@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autons.Left3Auton;
+import frc.robot.commands.Autons.Test3Piece;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ScoringCommands.AlgaeIntake;
 import frc.robot.commands.ScoringCommands.AlgaeScore;
@@ -388,6 +389,7 @@ public class RobotContainer {
     m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
     return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
+    // return new Test3Piece(m_Elevator, m_Arm, m_EndEffector, m_Climb);
   }
 
   public void zeroMotors() {
