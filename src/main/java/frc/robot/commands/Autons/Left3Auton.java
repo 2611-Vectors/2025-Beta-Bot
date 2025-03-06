@@ -27,7 +27,7 @@ public class Left3Auton extends SequentialCommandGroup {
     addCommands(
         Commands.parallel(
             Commands.sequence(
-                Commands.race(m_Climb.runWinch(() -> 0.15), Commands.waitSeconds(3))
+                Commands.race(m_Climb.runWinch(() -> 0.15), Commands.waitSeconds(3)),
                 m_Climb.runWinch(() -> 0d)),
             Commands.sequence(
                 // Commands.race(
