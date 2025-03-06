@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.ScoringCommands.LoadStationIntake;
 import frc.robot.commands.ScoringCommands.TravelPosition;
 import frc.robot.subsystems.Mechanisms.Arm;
+import frc.robot.subsystems.Mechanisms.Climb;
 import frc.robot.subsystems.Mechanisms.Elevator;
 import frc.robot.subsystems.Mechanisms.EndEffector;
 import frc.robot.util.CustomAutoBuilder;
@@ -20,18 +21,23 @@ import frc.robot.util.CustomAutoBuilder;
 public class Left3Auton extends SequentialCommandGroup {
 
   /** Creates a new L4Auton. */
-  public Left3Auton(Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector) {
+  public Left3Auton(Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, Climb m_Climb) {
     Command[] drivePaths = CustomAutoBuilder.getDrivePaths();
 
     addCommands(
-        // Commands.race(
-        drivePaths[0],
-        // Commands.sequence(
-        //     new WaitCommand(0.25), m_Elevator.setElevatorPosition(() -> L4_HEIGHT_IN))),
-        AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
-        scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[1], drivePaths[2]),
-        scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[3], drivePaths[4]),
-        new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
+        Commands.parallel(
+            Commands.sequence(
+                Commands.race(m_Climb.runWinch(() -> 0.15), Commands.waitSeconds(3))
+                m_Climb.runWinch(() -> 0d)),
+            Commands.sequence(
+                // Commands.race(
+                drivePaths[0],
+                // Commands.sequence(
+                //     new WaitCommand(0.25), m_Elevator.setElevatorPosition(() -> L4_HEIGHT_IN))),
+                AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
+                scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[1], drivePaths[2]),
+                // scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[3], drivePaths[4]),
+                new TravelPosition(m_Elevator, m_Arm, m_EndEffector))));
   }
 
   private Command scorePiece(

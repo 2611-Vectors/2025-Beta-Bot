@@ -220,21 +220,13 @@ public class RobotContainer {
 
     buttonBoard
         .leftBumper()
-        .whileTrue(
-            Commands.parallel(
-                m_EndEffector.setEndEffectorVoltage(() -> 6d),
-                m_Arm.setArmVoltage(() -> 0d),
-                m_Elevator.holdElevator()))
-        .onFalse(m_EndEffector.setEndEffectorVoltage(() -> 0d));
+        .whileTrue(Commands.run(() -> m_EndEffector.setVoltage(6)))
+        .onFalse(Commands.runOnce(() -> m_EndEffector.setVoltage(0)));
 
     buttonBoard
         .rightBumper()
-        .whileTrue(
-            Commands.parallel(
-                m_EndEffector.setEndEffectorVoltage(() -> -6d),
-                m_Arm.setArmVoltage(() -> 0d),
-                m_Elevator.holdElevator()))
-        .onFalse(m_EndEffector.setEndEffectorVoltage(() -> 0d));
+        .whileTrue(Commands.run(() -> m_EndEffector.setVoltage(-6)))
+        .onFalse(Commands.runOnce(() -> m_EndEffector.setVoltage(0)));
 
     buttonBoard
         .x()
@@ -248,15 +240,10 @@ public class RobotContainer {
                             m_EndEffector,
                             ALGAE_PICK2_HEIGHT,
                             ALGAE_PICK2_ANGLE),
-                        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE)
+                        new L1Scoring(m_Elevator, m_Arm, m_EndEffector)
                             .andThen(
                                 new HoldPosition(
-                                    m_Elevator,
-                                    m_Arm,
-                                    m_EndEffector,
-                                    L2_HEIGHT_IN,
-                                    TRAVEL_ANGLE,
-                                    0)),
+                                    m_Elevator, m_Arm, m_EndEffector, 40.0, TRAVEL_ANGLE, 0)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
@@ -400,7 +387,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
-    return new Left3Auton(m_Elevator, m_Arm, m_EndEffector);
+    return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
   }
 
   public void zeroMotors() {

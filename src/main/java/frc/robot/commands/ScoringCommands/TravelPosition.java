@@ -19,7 +19,7 @@ public class TravelPosition extends SequentialCommandGroup {
         Commands.race(
             m_Arm.setArmVoltage(() -> 0d),
             Commands.waitUntil(() -> m_Elevator.getLeftElevatorPosition() > 37.0),
-            m_Elevator.setElevatorPosition(() -> 35.0)),
+            m_Elevator.setElevatorPosition(() -> 38.0)),
         Commands.race(
             m_Arm
                 .setPivotAngle(() -> TRAVEL_ANGLE)
@@ -27,7 +27,7 @@ public class TravelPosition extends SequentialCommandGroup {
                     () ->
                         Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle()))
                             < ANGLE_TOLERANCE),
-            m_Elevator.setElevatorPosition(() -> 35.0)),
+            m_Elevator.setElevatorPosition(() -> 38.0)),
         Commands.parallel(
                 m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
                 m_Elevator.setElevatorPosition(() -> TRAVEL_HEIGHT_IN))
