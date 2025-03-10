@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autons.Left3Auton;
-import frc.robot.commands.Autons.Test3Piece;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ScoringCommands.AlgaeIntake;
 import frc.robot.commands.ScoringCommands.AlgaeScore;
@@ -79,6 +78,8 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandXboxController buttonBoard = new CommandXboxController(1);
+
+  private final CommandXboxController programmingTestController = new CommandXboxController(2);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -169,9 +170,32 @@ public class RobotContainer {
                     () ->
                         m_Vision.calculateCameraPositions(
                             () -> new Pose2d(5.05, 5.24, Rotation2d.fromDegrees(60)))))));
+    autoChooser.addOption(
+        "Tag Position Calculator",
+        Commands.sequence(
+            Commands.runOnce(
+                () -> m_Drive.setPose(new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)))),
+            Commands.parallel(
+                DriveCommands.joystickDrive(
+                    m_Drive, () -> 0.0, () -> 0.0, () -> 0.0), // Spins slowly
+                Commands.run(() -> m_Vision.calculateTagPositions(() -> m_Drive.getPose())))));
 
     // Configure the button bindings
     configureButtonBindings();
+    configProgrammingButtonConfigs();
+  }
+
+  private void configProgrammingButtonConfigs() {
+    programmingTestController
+        .a()
+        .onTrue(
+            Commands.defer(
+                () ->
+                    Commands.run(
+                        () ->
+                            m_Vision.calculateCameraPositions(
+                                m_Drive.getPose())),
+                Set.of(m_Vision)));
   }
 
   /**

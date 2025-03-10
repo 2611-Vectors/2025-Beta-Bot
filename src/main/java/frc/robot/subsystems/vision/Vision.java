@@ -225,9 +225,29 @@ public class Vision extends SubsystemBase {
   }
 
   public void calculateCameraPositions(Supplier<Pose2d> robotPoseSupplier) {
+    calculateCameraPositions(robotPoseSupplier.get());
+  }
+
+  public void calculateCameraPositions(Pose2d robotPose) {
+    Logger.recordOutput("Vision/AutoCameraConfig/RobotPose", robotPose);
+    Logger.recordOutput("Vision/AutoCameraConfig/Camera 0 Current Location/", robotToBackRightCam);
+    Logger.recordOutput(
+        "Vision/AutoCameraConfig/Camera 0 Current Angles/",
+        String.format(
+            "roll: %.2f, pitch: %.2f, yaw: %.2f",
+            robotToBackRightCam.getRotation().getMeasureX().magnitude(),
+            robotToBackRightCam.getRotation().getMeasureY().magnitude(),
+            robotToBackRightCam.getRotation().getMeasureZ().magnitude()));
+    Logger.recordOutput("Vision/AutoCameraConfig/Camera 1 Current Location/", robotToFrontLeftCam);
+    Logger.recordOutput(
+        "Vision/AutoCameraConfig/Camera 1 Current Angles/",
+        String.format(
+            "roll: %.2f, pitch: %.2f, yaw: %.2f",
+            robotToFrontLeftCam.getRotation().getMeasureX().magnitude(),
+            robotToFrontLeftCam.getRotation().getMeasureY().magnitude(),
+            robotToFrontLeftCam.getRotation().getMeasureZ().magnitude()));
     for (int i = 0; i < io.length; i++) {
       HashMap<Integer, Transform3d> robotToCamera = io[i].getCameraRelativeToRobot(inputs[i]);
-      Pose2d robotPose = robotPoseSupplier.get();
       Pose3d robotPose3d =
           new Pose3d(
               new Translation3d(robotPose.getX(), robotPose.getY(), 0.0),
