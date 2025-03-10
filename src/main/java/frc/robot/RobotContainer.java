@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autons.Left3Auton;
-import frc.robot.commands.Autons.Test3Piece;
+import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ScoringCommands.AlgaeIntake;
 import frc.robot.commands.ScoringCommands.AlgaeScore;
@@ -172,6 +172,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    // configureTestBindings();
   }
 
   /**
@@ -184,6 +185,19 @@ public class RobotContainer {
 
   private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.1);
 
+  private void configureTestBindings() {
+    // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
+    // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
+    // m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
+    // m_EndEffector.setDefaultCommand(
+    //     m_EndEffector.setEndEffectorVoltage(() -> buttonBoard.getLeftY() * (0.9 * 12)));
+    // m_Elevator.setDefaultCommand(
+    //     PID_FF_Tuners.ElevatorFFTuner(m_Elevator, () -> buttonBoard.getLeftY()));
+    // buttonBoard.start().whileTrue(m_Climb.runGrab(() -> -1.0)).onFalse(m_Climb.runGrab(() ->
+    // 0.0));
+    // m_Climb.setDefaultCommand(m_Climb.runWinch(() -> buttonBoard.getRightY()));
+  }
+
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     m_Drive.setDefaultCommand(
@@ -193,19 +207,14 @@ public class RobotContainer {
             () -> -slewRateY.calculate(controller.getLeftX()),
             () -> -controller.getRightX()));
 
-    // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
-    // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
-    // m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
-    // m_EndEffector.setDefaultCommand(
-    //     m_EndEffector.setEndEffectorVoltage(() -> buttonBoard.getLeftY() * (0.9 * 12)));
-    // m_Elevator.setDefaultCommand(
-    //     PID_FF_Tuners.ElevatorFFTuner(m_Elevator, () -> buttonBoard.getLeftY()));
-
     // CLIMB CONTROLS
     // new Trigger(() -> buttonBoard.getRightY() > -0.6)
     //     .whileTrue(m_Climb.runGrab(() -> 8.0))
     //     .onFalse(m_Climb.runGrab(() -> 0d));
-    buttonBoard.start().whileTrue(m_Climb.runGrab(() -> -1.0)).onFalse(m_Climb.runGrab(() -> 0.0));
+    buttonBoard
+        .start()
+        .onTrue(new ClimbCommand(m_Elevator, m_Arm, m_Climb, m_EndEffector))
+        .onFalse(m_Climb.runGrab(() -> 0.0));
     // new Trigger(() -> buttonBoard.getRightY() < 0.6)
     //     .whileTrue(m_Climb.runWinch(() -> 0.5))
     //     .onFalse(m_Climb.runWinch(() -> 0d));
