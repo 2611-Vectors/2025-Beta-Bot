@@ -94,6 +94,7 @@ public final class Constants {
     public static double ALGAE_PICK2_HEIGHT = 32.0;
     public static double ALGAE_PICK3_HEIGHT = 48.0;
     public static double PROCESSOR_HEIGHT = 27.0;
+    public static double CLIMB_HEIGHT_IN = 15.0;
 
     public static final double HOME_ANGLE = -101;
     public static final double TRAVEL_ANGLE = -101;
@@ -104,6 +105,7 @@ public final class Constants {
     public static double ALGAE_PICK2_ANGLE = 130;
     public static double ALGAE_PICK3_ANGLE = 130;
     public static double PROCCESOR_ANGLE = 180;
+    public static double CLIMB_ANGLE = -30;
 
     public static double ALGAE_INTAKE_SPEED = 8;
 
@@ -142,8 +144,8 @@ public final class Constants {
       poseAngleMap.put(KL, -300.0);
     }
 
-    public static final double MAX_VELOCITY = 4.0;//5.00; // Change back to 4 // 5.1
-    public static final double MAX_ACCELERATION = 2.1;//2.5; // Change back to 2.1 // 2.9
+    public static final double MAX_VELOCITY = 4.0; // 5.00; // Change back to 4 // 5.1
+    public static final double MAX_ACCELERATION = 2.1; // 2.5; // Change back to 2.1 // 2.9
   }
 
   public static class VisionConstants {

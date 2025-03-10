@@ -6,6 +6,7 @@ package frc.robot.subsystems.Mechanisms;
 
 import static frc.robot.Constants.ElevatorConstants.*;
 import static frc.robot.Constants.Setpoints.HOME_HEIGHT_IN;
+import static frc.robot.Constants.Setpoints.POSITION_TOLERANCE;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
