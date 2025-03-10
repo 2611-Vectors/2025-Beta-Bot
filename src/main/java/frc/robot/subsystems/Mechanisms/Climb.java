@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.Mechanisms;
 
-import static frc.robot.Constants.Climb.*;
+import static frc.robot.Constants.ClimbConstants.*;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -38,18 +38,18 @@ public class Climb extends SubsystemBase {
   }
 
   public Boolean getLimitSwitch() {
-    return limitSwitch.get();
+    return !limitSwitch.get();
   }
 
   public Command runWinch(Supplier<Double> power) {
     return run(
         () -> {
           if (Math.abs(power.get()) > 0.1) {
-            // if (limitSwitch.get()) {
-            //   setWinchVoltage(0);
-            // } else {
-            setWinchVoltage(power.get() * 12);
-            // }
+            if (!limitSwitch.get()) {
+              setWinchVoltage(0);
+            } else {
+              setWinchVoltage(power.get() * 12);
+            }
 
           } else {
             setWinchVoltage(0);

@@ -70,7 +70,7 @@ public class Elevator extends SubsystemBase {
     return run(
         () -> {
           double targetActual = target.get();
-          if (targetActual < STARTING_HEIGHT) {
+          if (targetActual < STARTING_HEIGHT - 3.38) {
             targetActual = HOME_HEIGHT_IN;
           }
           Logger.recordOutput("Elevator/TargetPosition", targetActual);
