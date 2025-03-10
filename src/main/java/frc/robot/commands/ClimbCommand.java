@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import static frc.robot.Constants.Setpoints.*;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Climb;
@@ -23,21 +24,25 @@ public class ClimbCommand extends SequentialCommandGroup {
     addCommands(
         m_EndEffector.setEndEffectorVoltage(() -> 0d),
         m_Elevator
-            .setElevatorPosition(() -> 30d)
-            .until(() -> Math.abs(30d - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
-        m_Elevator.holdElevator(),
-        m_Arm
-            .setPivotAngle(() -> CLIMB_ANGLE)
-            .until(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(CLIMB_ANGLE, m_Arm.getPivotAngle()))
-                        < ANGLE_TOLERANCE),
+            .setElevatorPosition(() -> 35d)
+            .until(() -> Math.abs(35d - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+        Commands.race(
+            m_Elevator.holdElevator(),
+            m_Arm
+                .setPivotAngle(() -> CLIMB_ANGLE)
+                .until(
+                    () ->
+                        Math.abs(Arm.getRelativeAngle(CLIMB_ANGLE, m_Arm.getPivotAngle()))
+                            < ANGLE_TOLERANCE)),
         m_Elevator
             .setElevatorPosition(() -> CLIMB_HEIGHT_IN)
             .until(
                 () ->
                     Math.abs(CLIMB_HEIGHT_IN - m_Elevator.getLeftElevatorPosition())
                         < POSITION_TOLERANCE),
-        m_Climb.runGrab(() -> -1.0));
+        Commands.parallel(
+            m_Elevator.setVoltage(() -> 0d),
+            m_Climb.runGrab(() -> -1d),
+            m_Arm.setPivotAngle(() -> CLIMB_ANGLE)));
   }
 }

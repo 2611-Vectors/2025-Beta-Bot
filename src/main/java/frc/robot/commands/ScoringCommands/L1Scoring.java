@@ -12,6 +12,7 @@ import static frc.robot.Constants.Setpoints.TRAVEL_ANGLE;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Elevator;
 import frc.robot.subsystems.Mechanisms.EndEffector;
@@ -45,6 +46,7 @@ public class L1Scoring extends SequentialCommandGroup {
                         Math.abs(L2_HEIGHT_IN - m_Elevator.getLeftElevatorPosition())
                             < POSITION_TOLERANCE),
             m_Arm.setPivotAngle(() -> L2_ANGLE)),
+        Commands.race(m_Elevator.setElevatorPosition(() -> L2_HEIGHT_IN), new WaitCommand(0.3)),
         m_EndEffector.setEndEffectorVoltage(() -> 2.0),
         Commands.race(
             m_Elevator.setElevatorPosition(() -> L2_HEIGHT_IN),

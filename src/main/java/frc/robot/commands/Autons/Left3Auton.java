@@ -78,7 +78,7 @@ public class Left3Auton extends SequentialCommandGroup {
         Commands.race(
             m_Elevator.setElevatorPosition(() -> height),
             m_Arm.setPivotAngle(() -> angle),
-            Commands.waitSeconds(0.25)),
+            Commands.waitSeconds(0.4)),
         Commands.race(
                 m_Elevator.setElevatorPosition(() -> height),
                 m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))

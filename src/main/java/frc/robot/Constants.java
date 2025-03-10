@@ -53,7 +53,7 @@ public final class Constants {
   public static class ArmConstants {
     public static final int ARM_MOTOR_ID = 44;
     public static final int ARM_ENCODER_PORT = 0;
-    public static final int PIVOT_ANGLE_OFFSET = -74;
+    public static final int PIVOT_ANGLE_OFFSET = 19;
 
     public static final double ARM_GEAR_RATIO = 43.95;
     public static final double ARM_MAX_VOLTAGE = 4.0; // Set this to 8 for competition
@@ -95,9 +95,11 @@ public final class Constants {
     public static double ALGAE_PICK3_HEIGHT = 48.0;
     public static double PROCESSOR_HEIGHT = 27.0;
     public static double CLIMB_HEIGHT_IN = 15.0;
+    public static double CLIMB_HEIGHT_IN = 15.0;
 
     public static final double HOME_ANGLE = -101;
     public static final double TRAVEL_ANGLE = -101;
+    public static final double SCORE_TRAVEL_ANGLE = -80;
     public static final double L2_ANGLE = -55;
     public static final double L3_ANGLE = -55;
     public static final double L4_ANGLE = -40;
@@ -105,6 +107,7 @@ public final class Constants {
     public static double ALGAE_PICK2_ANGLE = 130;
     public static double ALGAE_PICK3_ANGLE = 130;
     public static double PROCCESOR_ANGLE = 180;
+    public static double CLIMB_ANGLE = -30;
     public static double CLIMB_ANGLE = -30;
 
     public static double ALGAE_INTAKE_SPEED = 8;
