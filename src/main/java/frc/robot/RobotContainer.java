@@ -80,6 +80,8 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandXboxController buttonBoard = new CommandXboxController(1);
 
+  private final CommandXboxController programmingTestController = new CommandXboxController(2);
+
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
   private Boolean manualMode = false;
@@ -169,10 +171,34 @@ public class RobotContainer {
                     () ->
                         m_Vision.calculateCameraPositions(
                             () -> new Pose2d(5.05, 5.24, Rotation2d.fromDegrees(60)))))));
+    autoChooser.addOption(
+        "Tag Position Calculator",
+        Commands.sequence(
+            Commands.runOnce(
+                () -> m_Drive.setPose(new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)))),
+            Commands.parallel(
+                DriveCommands.joystickDrive(
+                    m_Drive, () -> 0.0, () -> 0.0, () -> 0.0), // Spins slowly
+                Commands.run(() -> m_Vision.calculateTagPositions(() -> m_Drive.getPose())))));
 
     // Configure the button bindings
     configureButtonBindings();
-    // configureTestBindings();
+    configProgrammingButtonConfigs();
+  }
+
+  private void configProgrammingButtonConfigs() {
+    programmingTestController
+        .a()
+        .onTrue(
+            Commands.defer(
+                () ->
+                    Commands.sequence(
+                        Commands.runOnce(() -> m_Vision.setPose(m_Drive.getPose())),
+                        Commands.run(
+                            () ->
+                                m_Vision.calculateCameraPositions(
+                                    () -> new Pose2d(5.05, 5.24, Rotation2d.fromDegrees(60))))),
+                Set.of(m_Drive, m_Vision)));
   }
 
   /**

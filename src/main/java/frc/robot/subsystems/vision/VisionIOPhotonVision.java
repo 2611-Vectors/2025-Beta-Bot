@@ -173,6 +173,21 @@ public class VisionIOPhotonVision implements VisionIO {
     // Add pose observation
     if (result.multitagResult.isPresent()) { // Multitag result
       for (var target : result.getTargets()) {
+        if (target.getPoseAmbiguity() < maxAmbiguity) {
+          var tagPose = aprilTagLayout.getTagPose(target.fiducialId);
+          if (tagPose.isPresent()) {
+            Transform3d fieldToTarget =
+                new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
+            Transform3d cameraToTarget = target.getBestCameraToTarget();
+            Transform3d fieldToCamera = fieldToTarget.plus(cameraToTarget.inverse());
+            robotToCamera.put(target.fiducialId, fieldToCamera);
+          }
+        }
+      }
+    } else if (!result.targets.isEmpty()) { // Single tag result
+
+      var target = result.targets.get(0);
+      if (target.getPoseAmbiguity() < maxAmbiguity) {
         var tagPose = aprilTagLayout.getTagPose(target.fiducialId);
         if (tagPose.isPresent()) {
           Transform3d fieldToTarget =
@@ -181,17 +196,6 @@ public class VisionIOPhotonVision implements VisionIO {
           Transform3d fieldToCamera = fieldToTarget.plus(cameraToTarget.inverse());
           robotToCamera.put(target.fiducialId, fieldToCamera);
         }
-      }
-    } else if (!result.targets.isEmpty()) { // Single tag result
-
-      var target = result.targets.get(0);
-      var tagPose = aprilTagLayout.getTagPose(target.fiducialId);
-      if (tagPose.isPresent()) {
-        Transform3d fieldToTarget =
-            new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
-        Transform3d cameraToTarget = target.getBestCameraToTarget();
-        Transform3d fieldToCamera = fieldToTarget.plus(cameraToTarget.inverse());
-        robotToCamera.put(target.fiducialId, fieldToCamera);
       }
     }
     return robotToCamera;
