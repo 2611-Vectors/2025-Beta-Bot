@@ -95,7 +95,6 @@ public final class Constants {
     public static double ALGAE_PICK3_HEIGHT = 48.0;
     public static double PROCESSOR_HEIGHT = 27.0;
     public static double CLIMB_HEIGHT_IN = 15.0;
-    public static double CLIMB_HEIGHT_IN = 15.0;
 
     public static final double HOME_ANGLE = -101;
     public static final double TRAVEL_ANGLE = -101;
@@ -107,7 +106,6 @@ public final class Constants {
     public static double ALGAE_PICK2_ANGLE = 130;
     public static double ALGAE_PICK3_ANGLE = 130;
     public static double PROCCESOR_ANGLE = 180;
-    public static double CLIMB_ANGLE = -30;
     public static double CLIMB_ANGLE = -30;
 
     public static double ALGAE_INTAKE_SPEED = 8;
