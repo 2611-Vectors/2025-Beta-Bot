@@ -45,7 +45,7 @@ public final class Constants {
     REPLAY
   }
 
-  public static class Climb {
+  public static class ClimbConstants {
     public static final int CLIMB_WINCH_ID = 52;
     public static final int CLIMB_GRAB_ID = 51;
   }

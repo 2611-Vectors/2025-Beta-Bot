@@ -184,6 +184,18 @@ public class RobotContainer {
 
   private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.1);
 
+  private void configureTestBindings() {
+    m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
+    // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
+    m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
+    // m_EndEffector.setDefaultCommand(
+    //     m_EndEffector.setEndEffectorVoltage(() -> buttonBoard.getLeftY() * (0.9 * 12)));
+    // m_Elevator.setDefaultCommand(
+    //     PID_FF_Tuners.ElevatorFFTuner(m_Elevator, () -> buttonBoard.getLeftY()));
+    buttonBoard.start().whileTrue(m_Climb.runGrab(() -> -1.0)).onFalse(m_Climb.runGrab(() -> 0.0));
+    m_Climb.setDefaultCommand(m_Climb.runWinch(() -> buttonBoard.getRightY()));
+  }
+
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     m_Drive.setDefaultCommand(

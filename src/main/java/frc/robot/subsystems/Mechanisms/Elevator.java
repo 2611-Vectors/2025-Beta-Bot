@@ -70,7 +70,7 @@ public class Elevator extends SubsystemBase {
     return run(
         () -> {
           double targetActual = target.get();
-          if (targetActual < STARTING_HEIGHT) {
+          if (targetActual < STARTING_HEIGHT - 3.38) {
             targetActual = HOME_HEIGHT_IN;
           }
           Logger.recordOutput("Elevator/TargetPosition", targetActual);
@@ -105,6 +105,10 @@ public class Elevator extends SubsystemBase {
 
   public double getRightElevatorPosition() {
     return rightMotor.getPosition().getValueAsDouble() * ROTATIONS_TO_INCHES + STARTING_HEIGHT;
+  }
+
+  public Supplier<Boolean> elevatorWithinTolerance() {
+    return () -> (Math.abs(30d - getLeftElevatorPosition()) < POSITION_TOLERANCE);
   }
 
   @Override
