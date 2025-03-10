@@ -224,12 +224,14 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public void calculateCameraPositions(Supplier<Pose2d> robotPoseSupplier) {
-    calculateCameraPositions(robotPoseSupplier.get());
+  private Pose2d startRobotPose = new Pose2d();
+
+  public void setPose(Pose2d pose) {
+    startRobotPose = pose;
   }
 
-  public void calculateCameraPositions(Pose2d robotPose) {
-    Logger.recordOutput("Vision/AutoCameraConfig/RobotPose", robotPose);
+  public void calculateCameraPositions(Supplier<Pose2d> robotPoseSupplier) {
+    Logger.recordOutput("Vision/AutoCameraConfig/RobotPose", startRobotPose);
     Logger.recordOutput("Vision/AutoCameraConfig/Camera 0 Current Location/", robotToBackRightCam);
     Logger.recordOutput(
         "Vision/AutoCameraConfig/Camera 0 Current Angles/",
@@ -248,6 +250,9 @@ public class Vision extends SubsystemBase {
             robotToFrontLeftCam.getRotation().getMeasureZ().magnitude()));
     for (int i = 0; i < io.length; i++) {
       HashMap<Integer, Transform3d> robotToCamera = io[i].getCameraRelativeToRobot(inputs[i]);
+      Pose2d robotPose =
+          new Pose2d(
+              startRobotPose.getX(), startRobotPose.getY(), robotPoseSupplier.get().getRotation());
       Pose3d robotPose3d =
           new Pose3d(
               new Translation3d(robotPose.getX(), robotPose.getY(), 0.0),

@@ -191,11 +191,13 @@ public class RobotContainer {
         .onTrue(
             Commands.defer(
                 () ->
-                    Commands.run(
-                        () ->
-                            m_Vision.calculateCameraPositions(
-                                m_Drive.getPose())),
-                Set.of(m_Vision)));
+                    Commands.sequence(
+                        Commands.runOnce(() -> m_Vision.setPose(m_Drive.getPose())),
+                        Commands.run(
+                            () ->
+                                m_Vision.calculateCameraPositions(
+                                    () -> new Pose2d(5.05, 5.24, Rotation2d.fromDegrees(60))))),
+                Set.of(m_Drive, m_Vision)));
   }
 
   /**
