@@ -18,8 +18,15 @@ public class ScoreSetpoint extends SequentialCommandGroup {
     super(
         m_Elevator
             .setElevatorPosition(() -> height)
-            .until(
-                () -> Math.abs(height - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+            .until(() -> m_Elevator.getLeftElevatorPosition() > 30d),
+        Commands.race(
+            m_Elevator
+                .setElevatorPosition(() -> height)
+                .until(
+                    () ->
+                        Math.abs(height - m_Elevator.getLeftElevatorPosition())
+                            < POSITION_TOLERANCE),
+            m_Arm.setPivotAngle(() -> TRAVEL_ANGLE)),
         Commands.parallel(
                 m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle))
             .until(

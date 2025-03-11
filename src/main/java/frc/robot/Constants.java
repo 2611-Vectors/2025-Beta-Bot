@@ -98,7 +98,6 @@ public final class Constants {
 
     public static final double HOME_ANGLE = -101;
     public static final double TRAVEL_ANGLE = -101;
-    public static final double SCORE_TRAVEL_ANGLE = -80;
     public static final double L2_ANGLE = -55;
     public static final double L3_ANGLE = -55;
     public static final double L4_ANGLE = -40;

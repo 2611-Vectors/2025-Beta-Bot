@@ -31,9 +31,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autons.Left3Auton;
 import frc.robot.commands.ClimbCommand;
-import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.PID_FF_Tuners;
 import frc.robot.commands.ScoringCommands.AlgaeIntake;
 import frc.robot.commands.ScoringCommands.AlgaeScore;
 import frc.robot.commands.ScoringCommands.AlgaeTravelPosition;
@@ -213,18 +211,6 @@ public class RobotContainer {
 
   private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.1);
 
-  private void configureTestBindings() {
-    m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
-    // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
-    m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
-    // m_EndEffector.setDefaultCommand(
-    //     m_EndEffector.setEndEffectorVoltage(() -> buttonBoard.getLeftY() * (0.9 * 12)));
-    // m_Elevator.setDefaultCommand(
-    //     PID_FF_Tuners.ElevatorFFTuner(m_Elevator, () -> buttonBoard.getLeftY()));
-    buttonBoard.start().whileTrue(m_Climb.runGrab(() -> -1.0)).onFalse(m_Climb.runGrab(() -> 0.0));
-    m_Climb.setDefaultCommand(m_Climb.runWinch(() -> buttonBoard.getRightY()));
-  }
-
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     m_Drive.setDefaultCommand(
@@ -277,10 +263,15 @@ public class RobotContainer {
                             m_EndEffector,
                             ALGAE_PICK2_HEIGHT,
                             ALGAE_PICK2_ANGLE),
-                        new L1Scoring(m_Elevator, m_Arm, m_EndEffector)
+                        new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE)
                             .andThen(
                                 new HoldPosition(
-                                    m_Elevator, m_Arm, m_EndEffector, 40.0, TRAVEL_ANGLE, 0)),
+                                    m_Elevator,
+                                    m_Arm,
+                                    m_EndEffector,
+                                    L2_HEIGHT_IN,
+                                    TRAVEL_ANGLE,
+                                    0)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
