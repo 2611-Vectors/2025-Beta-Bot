@@ -12,6 +12,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.MechanismSimulator;
@@ -41,6 +43,8 @@ public class Elevator extends SubsystemBase {
     PhoenixUtil.configMotorElevator(rightMotor, false, NeutralModeValue.Brake, 70);
 
     housingDiamter = new LoggedNetworkNumber("/Elevator/Housing Diameter", STRING_HOUSING_DIAMETER);
+
+    elevatorProfiledController.reset(getLeftElevatorPosition());
   }
 
   /** Function for voltage control */
@@ -96,6 +100,43 @@ public class Elevator extends SubsystemBase {
         });
   }
 
+  private final ProfiledPIDController elevatorProfiledController =
+      new ProfiledPIDController(
+          elevatorPID.getP(),
+          elevatorPID.getI(),
+          elevatorPID.getD(),
+          new TrapezoidProfile.Constraints(30, 15));
+
+  public Command setSmartElevatorPosition(Supplier<Double> target) {
+    elevatorProfiledController.setGoal(target.get());
+    return run(
+        () -> {
+          double targetActual = target.get();
+          if (targetActual < STARTING_HEIGHT) {
+            targetActual = HOME_HEIGHT_IN;
+          }
+          Logger.recordOutput("Elevator/TargetPosition", targetActual);
+
+          // // Simulator update
+          MechanismSimulator.updateElevator(targetActual);
+          // if (!MechanismSimulator.isLegalTarget()) {
+          //   double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
+          //   targetActual += offset;
+          // }
+          double pidPart =
+              elevatorProfiledController.calculate(getLeftElevatorPosition(), targetActual);
+          double ffPart = elevatorFF.calculate(targetActual);
+          if (Math.abs(getLeftElevatorPosition() - targetActual) < 0.25) {
+            pidPart = 0;
+            ffPart = elevatorFF.getKg();
+          }
+          Logger.recordOutput(
+              "Elevator/VoltageApplied",
+              MathUtil.clamp(pidPart + ffPart, -1.8, ELEVATOR_MAX_VOLTAGE));
+          setVoltage(MathUtil.clamp(pidPart + ffPart, -1.8, ELEVATOR_MAX_VOLTAGE));
+        });
+  }
+
   /**
    * Function to get the Elevator position uses the left by default but graphs both the left and
    * right encoder values
@@ -117,6 +158,12 @@ public class Elevator extends SubsystemBase {
     // This method will be called once per scheduler run
     Logger.recordOutput("Elevator/LeftEncoder", getLeftElevatorPosition());
     Logger.recordOutput("Elevator/RightEncoder", getRightElevatorPosition());
+
+    Logger.recordOutput(
+        "Elevator/Left Elevator Supplied Current", leftMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "Elevator/Right Elevator Supplied Current",
+        rightMotor.getSupplyCurrent().getValueAsDouble());
     MechanismSimulatorActual.updateElevator(getLeftElevatorPosition());
     elevatorPID.update();
   }

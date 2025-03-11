@@ -71,7 +71,7 @@ public final class Constants {
 
     public static final double ELEVATOR_P = 2.0;
     public static final double ELEVATOR_I = 0.00;
-    public static final double ELEVATOR_D = 0.07;
+    public static final double ELEVATOR_D = 0.05;
 
     public static final double ELEVATOR_MAX_VOLTAGE = 12.0; // Set this to 8 for competition
 
