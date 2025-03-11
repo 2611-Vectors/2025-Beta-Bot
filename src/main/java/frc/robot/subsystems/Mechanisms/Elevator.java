@@ -43,6 +43,8 @@ public class Elevator extends SubsystemBase {
     PhoenixUtil.configMotorElevator(rightMotor, false, NeutralModeValue.Brake, 70);
 
     housingDiamter = new LoggedNetworkNumber("/Elevator/Housing Diameter", STRING_HOUSING_DIAMETER);
+
+    elevatorProfiledController.reset(getLeftElevatorPosition());
   }
 
   /** Function for voltage control */
@@ -106,6 +108,7 @@ public class Elevator extends SubsystemBase {
           new TrapezoidProfile.Constraints(30, 15));
 
   public Command setSmartElevatorPosition(Supplier<Double> target) {
+    elevatorProfiledController.setGoal(target.get());
     return run(
         () -> {
           double targetActual = target.get();
@@ -120,7 +123,6 @@ public class Elevator extends SubsystemBase {
           //   double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
           //   targetActual += offset;
           // }
-
           double pidPart =
               elevatorProfiledController.calculate(getLeftElevatorPosition(), targetActual);
           double ffPart = elevatorFF.calculate(targetActual);
