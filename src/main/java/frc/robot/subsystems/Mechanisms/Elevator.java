@@ -12,6 +12,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.MechanismSimulator;
@@ -84,6 +86,43 @@ public class Elevator extends SubsystemBase {
           // }
 
           double pidPart = elevatorPID.calculate(getLeftElevatorPosition(), targetActual);
+          double ffPart = elevatorFF.calculate(targetActual);
+          if (Math.abs(getLeftElevatorPosition() - targetActual) < 0.25) {
+            pidPart = 0;
+            ffPart = elevatorFF.getKg();
+          }
+          Logger.recordOutput(
+              "Elevator/VoltageApplied",
+              MathUtil.clamp(pidPart + ffPart, -1.8, ELEVATOR_MAX_VOLTAGE));
+          setVoltage(MathUtil.clamp(pidPart + ffPart, -1.8, ELEVATOR_MAX_VOLTAGE));
+        });
+  }
+
+  private final ProfiledPIDController elevatorProfiledController =
+      new ProfiledPIDController(
+          elevatorPID.getP(),
+          elevatorPID.getI(),
+          elevatorPID.getD(),
+          new TrapezoidProfile.Constraints(30, 15));
+
+  public Command setSmartElevatorPosition(Supplier<Double> target) {
+    return run(
+        () -> {
+          double targetActual = target.get();
+          if (targetActual < STARTING_HEIGHT) {
+            targetActual = HOME_HEIGHT_IN;
+          }
+          Logger.recordOutput("Elevator/TargetPosition", targetActual);
+
+          // // Simulator update
+          MechanismSimulator.updateElevator(targetActual);
+          // if (!MechanismSimulator.isLegalTarget()) {
+          //   double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
+          //   targetActual += offset;
+          // }
+
+          double pidPart =
+              elevatorProfiledController.calculate(getLeftElevatorPosition(), targetActual);
           double ffPart = elevatorFF.calculate(targetActual);
           if (Math.abs(getLeftElevatorPosition() - targetActual) < 0.25) {
             pidPart = 0;
