@@ -117,6 +117,12 @@ public class Elevator extends SubsystemBase {
     // This method will be called once per scheduler run
     Logger.recordOutput("Elevator/LeftEncoder", getLeftElevatorPosition());
     Logger.recordOutput("Elevator/RightEncoder", getRightElevatorPosition());
+
+    Logger.recordOutput(
+        "Elevator/Left Elevator Supplied Current", leftMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "Elevator/Right Elevator Supplied Current",
+        rightMotor.getSupplyCurrent().getValueAsDouble());
     MechanismSimulatorActual.updateElevator(getLeftElevatorPosition());
     elevatorPID.update();
   }
