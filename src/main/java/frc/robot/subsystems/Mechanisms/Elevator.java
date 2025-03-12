@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.MechanismSimulator;
@@ -32,6 +33,8 @@ public class Elevator extends SubsystemBase {
       new TunablePIDController(ELEVATOR_P, ELEVATOR_I, ELEVATOR_D, "/ElevatorPID/");
   public final ElevatorFeedforward elevatorFF = new ElevatorFeedforward(0.0, 0.45, 0.0);
 
+  private final Encoder elevatorEncoder = new Encoder(1, 2);
+
   LoggedNetworkNumber housingDiamter;
 
   /** Creates a new Elevator. */
@@ -44,7 +47,7 @@ public class Elevator extends SubsystemBase {
 
     housingDiamter = new LoggedNetworkNumber("/Elevator/Housing Diameter", STRING_HOUSING_DIAMETER);
 
-    elevatorProfiledController.reset(getLeftElevatorPosition());
+    elevatorProfiledController.reset(getElevatorPosition());
   }
 
   /** Function for voltage control */
@@ -87,9 +90,9 @@ public class Elevator extends SubsystemBase {
           //   targetActual += offset;
           // }
 
-          double pidPart = elevatorPID.calculate(getLeftElevatorPosition(), targetActual);
+          double pidPart = elevatorPID.calculate(getElevatorPosition(), targetActual);
           double ffPart = elevatorFF.calculate(targetActual);
-          // if (Math.abs(getLeftElevatorPosition() - targetActual) < 0.25) {
+          // if (Math.abs(getElevatorPosition() - targetActual) < 0.25) {
           //   pidPart = 0;
           //   ffPart = elevatorFF.getKg();
           // }
@@ -105,9 +108,10 @@ public class Elevator extends SubsystemBase {
           elevatorPID.getP(),
           elevatorPID.getI(),
           elevatorPID.getD(),
-          new TrapezoidProfile.Constraints(30, 15));
+          new TrapezoidProfile.Constraints(100, 100));
 
   public Command setSmartElevatorPosition(Supplier<Double> target) {
+    elevatorProfiledController.reset(getElevatorPosition());
     elevatorProfiledController.setGoal(target.get());
     return run(
         () -> {
@@ -123,10 +127,9 @@ public class Elevator extends SubsystemBase {
           //   double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
           //   targetActual += offset;
           // }
-          double pidPart =
-              elevatorProfiledController.calculate(getLeftElevatorPosition(), targetActual);
+          double pidPart = elevatorProfiledController.calculate(getElevatorPosition());
           double ffPart = elevatorFF.calculate(targetActual);
-          if (Math.abs(getLeftElevatorPosition() - targetActual) < 0.25) {
+          if (Math.abs(getElevatorPosition() - targetActual) < 0.25) {
             pidPart = 0;
             ffPart = elevatorFF.getKg();
           }
@@ -149,8 +152,13 @@ public class Elevator extends SubsystemBase {
     return rightMotor.getPosition().getValueAsDouble() * ROTATIONS_TO_INCHES + STARTING_HEIGHT;
   }
 
+  public double getElevatorPosition() {
+    return (elevatorEncoder.getDistance() * Math.PI * STRING_HOUSING_DIAMETER * 1.416807) / 2048
+        + STARTING_HEIGHT;
+  }
+
   public Supplier<Boolean> elevatorWithinTolerance() {
-    return () -> (Math.abs(30d - getLeftElevatorPosition()) < POSITION_TOLERANCE);
+    return () -> (Math.abs(30d - getElevatorPosition()) < POSITION_TOLERANCE);
   }
 
   @Override
@@ -164,7 +172,8 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput(
         "Elevator/Right Elevator Supplied Current",
         rightMotor.getSupplyCurrent().getValueAsDouble());
-    MechanismSimulatorActual.updateElevator(getLeftElevatorPosition());
+    Logger.recordOutput("Elevator/Current Position", getElevatorPosition());
+    MechanismSimulatorActual.updateElevator(getElevatorPosition());
     elevatorPID.update();
   }
 }

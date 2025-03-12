@@ -23,8 +23,7 @@ public class AlgaeIntake extends SequentialCommandGroup {
     super(
         m_Elevator
             .setElevatorPosition(() -> height)
-            .until(
-                () -> Math.abs(height - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+            .until(() -> Math.abs(height - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
         Commands.parallel(
                 m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle))
             .until(() -> Math.abs(Arm.getRelativeAngle(height, m_Arm.getPivotAngle())) < angle),

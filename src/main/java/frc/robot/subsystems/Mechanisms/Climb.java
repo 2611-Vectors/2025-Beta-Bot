@@ -8,7 +8,6 @@ import static frc.robot.Constants.ClimbConstants.*;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,13 +19,13 @@ public class Climb extends SubsystemBase {
   private final SparkMax winchMotor;
 
   private final SparkMax grabMotor;
-  private final DigitalInput limitSwitch;
+  // private final DigitalInput limitSwitch;
 
   public Climb() {
     winchMotor = new SparkMax(CLIMB_WINCH_ID, MotorType.kBrushless);
     grabMotor = new SparkMax(CLIMB_GRAB_ID, MotorType.kBrushless);
 
-    limitSwitch = new DigitalInput(1);
+    // limitSwitch = new DigitalInput(1);
   }
 
   public void setWinchVoltage(double voltage) {
@@ -38,18 +37,19 @@ public class Climb extends SubsystemBase {
   }
 
   public Boolean getLimitSwitch() {
-    return !limitSwitch.get();
+    // return !limitSwitch.get();
+    return false;
   }
 
   public Command runWinch(Supplier<Double> power) {
     return run(
         () -> {
           if (Math.abs(power.get()) > 0.1) {
-            if (!limitSwitch.get()) {
-              setWinchVoltage(0);
-            } else {
-              setWinchVoltage(power.get() * 12);
-            }
+            // if (!limitSwitch.get()) {
+            //   setWinchVoltage(0);
+            // } else {
+            //   setWinchVoltage(power.get() * 12);
+            // }
 
           } else {
             setWinchVoltage(0);

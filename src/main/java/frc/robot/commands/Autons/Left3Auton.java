@@ -64,8 +64,7 @@ public class Left3Auton extends SequentialCommandGroup {
     return Commands.sequence(
         m_Elevator
             .setElevatorPosition(() -> height)
-            .until(
-                () -> Math.abs(height - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+            .until(() -> Math.abs(height - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
         Commands.parallel(
                 m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle * 2))
             .until(() -> Math.abs(Arm.getRelativeAngle(angle * 2, m_Arm.getPivotAngle())) < 10),

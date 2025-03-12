@@ -19,7 +19,7 @@ public class LoadStationIntake extends SequentialCommandGroup {
             .setElevatorPosition(() -> INTAKE_HEIGHT_IN)
             .until(
                 () ->
-                    Math.abs(INTAKE_HEIGHT_IN - m_Elevator.getLeftElevatorPosition())
+                    Math.abs(INTAKE_HEIGHT_IN - m_Elevator.getElevatorPosition())
                         < POSITION_TOLERANCE),
         Commands.parallel(
                 m_Elevator.setElevatorPosition(() -> INTAKE_HEIGHT_IN),

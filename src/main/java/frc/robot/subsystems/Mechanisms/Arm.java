@@ -128,6 +128,7 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     Logger.recordOutput("Arm/current angle", getPivotAngle());
+    Logger.recordOutput("Arm/Motor Position", arm.getPosition().getValueAsDouble());
     MechanismSimulatorActual.updateArm(getPivotAngle());
     armPID.update();
 

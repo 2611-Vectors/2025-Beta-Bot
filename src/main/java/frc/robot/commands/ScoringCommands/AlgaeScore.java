@@ -24,7 +24,7 @@ public class AlgaeScore extends SequentialCommandGroup {
                 m_Arm.setArmVoltage(() -> 0d),
                 m_Elevator
                     .setElevatorPosition(() -> 35.0)
-                    .until(() -> m_Elevator.getLeftElevatorPosition() > 30.0))
+                    .until(() -> m_Elevator.getElevatorPosition() > 30.0))
             .onlyIf(
                 () -> Math.abs(Arm.getRelativeAngle(PROCCESOR_ANGLE, m_Arm.getPivotAngle())) > 10),
         Commands.race(
@@ -40,7 +40,7 @@ public class AlgaeScore extends SequentialCommandGroup {
                 .setElevatorPosition(() -> PROCESSOR_HEIGHT)
                 .until(
                     () ->
-                        Math.abs(PROCESSOR_HEIGHT - m_Elevator.getLeftElevatorPosition())
+                        Math.abs(PROCESSOR_HEIGHT - m_Elevator.getElevatorPosition())
                             < POSITION_TOLERANCE),
             m_Arm.setPivotAngle(() -> PROCCESOR_ANGLE)),
         Commands.parallel(

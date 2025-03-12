@@ -29,8 +29,7 @@ public class L1Scoring extends SequentialCommandGroup {
         Commands.race(
             m_Elevator
                 .setElevatorPosition(() -> 40.0)
-                .until(
-                    () -> Math.abs(40 - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+                .until(() -> Math.abs(40 - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
             m_Arm.setPivotAngle(() -> TRAVEL_ANGLE)),
         m_Arm
             .setPivotAngle(() -> L2_ANGLE)
@@ -43,7 +42,7 @@ public class L1Scoring extends SequentialCommandGroup {
                 .setElevatorPosition(() -> L2_HEIGHT_IN)
                 .until(
                     () ->
-                        Math.abs(L2_HEIGHT_IN - m_Elevator.getLeftElevatorPosition())
+                        Math.abs(L2_HEIGHT_IN - m_Elevator.getElevatorPosition())
                             < POSITION_TOLERANCE),
             m_Arm.setPivotAngle(() -> L2_ANGLE)),
         Commands.race(m_Elevator.setElevatorPosition(() -> L2_HEIGHT_IN), new WaitCommand(0.3)),
@@ -55,8 +54,7 @@ public class L1Scoring extends SequentialCommandGroup {
         Commands.race(
             m_Elevator
                 .setElevatorPosition(() -> 40.0)
-                .until(
-                    () -> Math.abs(40 - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+                .until(() -> Math.abs(40 - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
             m_Arm.setPivotAngle(() -> L2_ANGLE)),
         m_EndEffector.setEndEffectorVoltage(() -> 0.0),
         Commands.race(

@@ -26,8 +26,7 @@ public class AlgaeTravelPosition extends SequentialCommandGroup {
         m_EndEffector.setEndEffectorVoltage(() -> ALGAE_INTAKE_SPEED),
         m_Elevator
             .setElevatorPosition(() -> 40.0)
-            .until(
-                () -> Math.abs(40.0 - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+            .until(() -> Math.abs(40.0 - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
         m_Arm
             .setPivotAngle(() -> PROCCESOR_ANGLE)
             .until(

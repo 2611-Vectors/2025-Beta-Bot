@@ -31,6 +31,7 @@ public class Test3Piece extends SequentialCommandGroup {
                 Commands.race(m_Climb.runWinch(() -> 0.15), Commands.waitSeconds(3)),
                 m_Climb.runWinch(() -> 0d)),
             Commands.sequence(
+                Commands.runOnce(() -> elevatorSlewRate.reset(m_Elevator.getElevatorPosition())),
                 Commands.race(
                     drivePaths[0],
                     m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
@@ -38,10 +39,18 @@ public class Test3Piece extends SequentialCommandGroup {
                 AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
                 scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[1], drivePaths[2]),
                 scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[3], drivePaths[4]),
+                m_Arm
+                    .setPivotAngle(() -> TRAVEL_ANGLE)
+                    .until(
+                        () ->
+                            Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle()))
+                                < ANGLE_TOLERANCE),
+                new WaitCommand(0.25),
+                m_EndEffector.setEndEffectorVoltage(() -> 0.0),
                 new TravelPosition(m_Elevator, m_Arm, m_EndEffector))));
   }
 
-  SlewRateLimiter elevatorSlewRate = new SlewRateLimiter(15, -15, STARTING_HEIGHT);
+  SlewRateLimiter elevatorSlewRate = new SlewRateLimiter(20, -20, STARTING_HEIGHT);
 
   private double getElevatorPosition(double position) {
     return elevatorSlewRate.calculate(position);
@@ -57,19 +66,30 @@ public class Test3Piece extends SequentialCommandGroup {
         Commands.parallel(
             drivePath1,
             Commands.sequence(
-                m_Elevator
-                    .setElevatorPosition(() -> getElevatorPosition(INTAKE_HEIGHT_IN))
-                    .until(
-                        () ->
-                            Math.abs(INTAKE_HEIGHT_IN - m_Elevator.getLeftElevatorPosition())
-                                < POSITION_TOLERANCE),
+                Commands.race(
+                    new WaitCommand(0.5),
+                    m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
+                    m_Elevator.holdElevator()),
+                Commands.runOnce(() -> elevatorSlewRate.reset(m_Elevator.getElevatorPosition())),
+                Commands.race(
+                    m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
+                    Commands.sequence(
+                        new WaitCommand(0.5), m_EndEffector.setEndEffectorVoltage(() -> 0.0)),
+                    m_Elevator
+                        .setElevatorPosition(() -> getElevatorPosition(INTAKE_HEIGHT_IN))
+                        .until(
+                            () ->
+                                Math.abs(INTAKE_HEIGHT_IN - m_Elevator.getElevatorPosition())
+                                    < POSITION_TOLERANCE)),
                 new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector))),
         Commands.race(
             drivePath2,
             Commands.sequence(
                 new WaitCommand(0.5),
-                m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
-                m_Elevator.setElevatorPosition(() -> getElevatorPosition(L4_HEIGHT_IN)))),
+                Commands.runOnce(() -> elevatorSlewRate.reset(m_Elevator.getElevatorPosition())),
+                Commands.parallel(
+                    m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
+                    m_Elevator.setElevatorPosition(() -> getElevatorPosition(L4_HEIGHT_IN))))),
         AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE));
   }
 
@@ -78,28 +98,25 @@ public class Test3Piece extends SequentialCommandGroup {
     return Commands.sequence(
         m_Elevator
             .setElevatorPosition(() -> height)
-            .until(
-                () -> Math.abs(height - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
-        Commands.parallel(
-                m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle * 2))
-            .until(() -> Math.abs(Arm.getRelativeAngle(angle * 2, m_Arm.getPivotAngle())) < 10),
+            .until(() -> Math.abs(height - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
         Commands.parallel(
                 m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle))
             .until(
                 () ->
                     Math.abs(Arm.getRelativeAngle(angle, m_Arm.getPivotAngle())) < ANGLE_TOLERANCE),
-        m_EndEffector.setEndEffectorVoltage(() -> 6.0),
+        m_EndEffector.setEndEffectorVoltage(() -> 10.0),
         Commands.race(
             m_Elevator.setElevatorPosition(() -> height),
             m_Arm.setPivotAngle(() -> angle),
-            Commands.waitSeconds(0.25)),
-        Commands.race(
-                m_Elevator.setElevatorPosition(() -> height),
-                m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))
-            .until(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle()))
-                        < ANGLE_TOLERANCE),
-        m_EndEffector.setEndEffectorVoltage(() -> 0.0));
+            Commands.waitSeconds(0.3)) // ,
+        // Commands.race(
+        //         m_Elevator.setElevatorPosition(() -> height),
+        //         m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))
+        //     .until(
+        //         () ->
+        //             Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle()))
+        //                 < ANGLE_TOLERANCE),
+        // m_EndEffector.setEndEffectorVoltage(() -> 0.0)
+        );
   }
 }

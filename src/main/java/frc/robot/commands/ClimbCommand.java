@@ -25,7 +25,7 @@ public class ClimbCommand extends SequentialCommandGroup {
         m_EndEffector.setEndEffectorVoltage(() -> 0d),
         m_Elevator
             .setElevatorPosition(() -> 35d)
-            .until(() -> Math.abs(35d - m_Elevator.getLeftElevatorPosition()) < POSITION_TOLERANCE),
+            .until(() -> Math.abs(35d - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
         Commands.race(
             m_Elevator.holdElevator(),
             m_Arm
@@ -38,7 +38,7 @@ public class ClimbCommand extends SequentialCommandGroup {
             .setElevatorPosition(() -> CLIMB_HEIGHT_IN)
             .until(
                 () ->
-                    Math.abs(CLIMB_HEIGHT_IN - m_Elevator.getLeftElevatorPosition())
+                    Math.abs(CLIMB_HEIGHT_IN - m_Elevator.getElevatorPosition())
                         < POSITION_TOLERANCE),
         Commands.parallel(
             m_Elevator.setVoltage(() -> 0d),

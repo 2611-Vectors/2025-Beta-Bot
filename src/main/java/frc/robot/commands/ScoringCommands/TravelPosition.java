@@ -18,7 +18,7 @@ public class TravelPosition extends SequentialCommandGroup {
         // This is a safety check to not move the arm until it above a certain hight
         Commands.race(
             m_Arm.setArmVoltage(() -> 0d),
-            Commands.waitUntil(() -> m_Elevator.getLeftElevatorPosition() > 37.0),
+            Commands.waitUntil(() -> m_Elevator.getElevatorPosition() > 37.0),
             m_Elevator.setElevatorPosition(() -> 38.0)),
         Commands.race(
             m_Arm
@@ -33,7 +33,7 @@ public class TravelPosition extends SequentialCommandGroup {
                 m_Elevator.setElevatorPosition(() -> TRAVEL_HEIGHT_IN))
             .until(
                 () ->
-                    Math.abs(TRAVEL_HEIGHT_IN - m_Elevator.getLeftElevatorPosition())
+                    Math.abs(TRAVEL_HEIGHT_IN - m_Elevator.getElevatorPosition())
                         < POSITION_TOLERANCE),
         Commands.parallel(
             m_Elevator.holdElevator(),

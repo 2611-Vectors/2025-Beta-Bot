@@ -27,7 +27,7 @@ public class setElevatorHeight extends SequentialCommandGroup {
                 .setElevatorPosition(() -> height.get())
                 .until(
                     () ->
-                        Math.abs(height.get() - m_Elevator.getLeftElevatorPosition())
+                        Math.abs(height.get() - m_Elevator.getElevatorPosition())
                             < POSITION_TOLERANCE)));
   }
 }

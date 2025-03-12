@@ -433,8 +433,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
-    return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return new Test3Piece(m_Elevator, m_Arm, m_EndEffector, m_Climb);
+    return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
   }
 
   public void zeroMotors() {

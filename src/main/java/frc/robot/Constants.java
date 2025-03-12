@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.Mechanisms.Arm;
@@ -127,6 +128,19 @@ public final class Constants {
     public static final Pose2d IJ = new Pose2d(5.1079, 5.0974, Rotation2d.fromDegrees(60));
     public static final Pose2d KL = new Pose2d(3.8707, 5.0974, Rotation2d.fromDegrees(120));
 
+    // public static final Pose2d AB =
+    //     new Pose2d(applyRobotWidth(3.66, 4.03, 0, 0.3556), Rotation2d.fromDegrees(180));
+    // public static final Pose2d CD =
+    //     new Pose2d(applyRobotWidth(4.07, 3.31, -60, 0.3556), Rotation2d.fromDegrees(-120));
+    // public static final Pose2d EF =
+    //     new Pose2d(applyRobotWidth(4.90, 3.31, -120, 0.3556), Rotation2d.fromDegrees(-60));
+    // public static final Pose2d GH =
+    //     new Pose2d(applyRobotWidth(5.32, 4.03, -180, 0.3556), Rotation2d.fromDegrees(0));
+    // public static final Pose2d IJ =
+    //     new Pose2d(applyRobotWidth(4.90, 4.75, -240, 0.3556), Rotation2d.fromDegrees(60));
+    // public static final Pose2d KL =
+    //     new Pose2d(applyRobotWidth(4.07, 4.75, -300, 0.3556), Rotation2d.fromDegrees(120));
+
     public static final double LEFT_OFFSET = 0.075; // In Meters
     public static final double RIGHT_OFFSET = -0.255; // In Meters
 
@@ -134,6 +148,13 @@ public final class Constants {
     public static final Pose2d R0 = new Pose2d(1.13847, .94297, Rotation2d.fromDegrees(-120));
 
     public static final Map<Pose2d, Double> poseAngleMap = new HashMap<>();
+
+    public static Translation2d applyRobotWidth(
+        double x, double y, double angle, double robotWidth) {
+      return new Translation2d(
+          x - robotWidth * Math.cos(Math.toRadians(angle)),
+          y + robotWidth * Math.sin(Math.toRadians(angle)));
+    }
 
     static {
       poseAngleMap.put(AB, 0.0);
@@ -144,8 +165,8 @@ public final class Constants {
       poseAngleMap.put(KL, -300.0);
     }
 
-    public static final double MAX_VELOCITY = 4.0; // 5.00; // Change back to 4 // 5.1
-    public static final double MAX_ACCELERATION = 2.1; // 2.5; // Change back to 2.1 // 2.9
+    public static final double MAX_VELOCITY = 5.0; // 5.00; // Change back to 4 // 5.1
+    public static final double MAX_ACCELERATION = 2.5; // 2.5; // Change back to 2.1 // 2.9
   }
 
   public static class VisionConstants {
