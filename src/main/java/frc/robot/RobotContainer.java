@@ -102,9 +102,13 @@ public class RobotContainer {
             new Vision(
                 m_Drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.BackRightCam, VisionConstants.robotToBackRightCam),
+                    VisionConstants.batterySdsCam, VisionConstants.robotToBatterySdsCam),
                 new VisionIOPhotonVision(
-                    VisionConstants.FrontLeftCam, VisionConstants.robotToFrontLeftCam));
+                    VisionConstants.batteryElevatorCam, VisionConstants.robotToBatteryElevatorCam),
+                new VisionIOPhotonVision(
+                    VisionConstants.intakeSdsCam, VisionConstants.robotToIntakeSdsCam),
+                new VisionIOPhotonVision(
+                    VisionConstants.intakeElevatorCam, VisionConstants.robotToIntakeElevatorCam));
         break;
 
       case SIM:
@@ -120,8 +124,8 @@ public class RobotContainer {
             new Vision(
                 m_Drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.BackRightCam,
-                    VisionConstants.robotToBackRightCam,
+                    VisionConstants.batterySdsCam,
+                    VisionConstants.robotToBatterySdsCam,
                     m_Drive::getPose));
         break;
 

@@ -89,10 +89,10 @@ public class Elevator extends SubsystemBase {
 
           double pidPart = elevatorPID.calculate(getLeftElevatorPosition(), targetActual);
           double ffPart = elevatorFF.calculate(targetActual);
-          if (Math.abs(getLeftElevatorPosition() - targetActual) < 0.25) {
-            pidPart = 0;
-            ffPart = elevatorFF.getKg();
-          }
+          // if (Math.abs(getLeftElevatorPosition() - targetActual) < 0.25) {
+          //   pidPart = 0;
+          //   ffPart = elevatorFF.getKg();
+          // }
           Logger.recordOutput(
               "Elevator/VoltageApplied",
               MathUtil.clamp(pidPart + ffPart, -1.8, ELEVATOR_MAX_VOLTAGE));

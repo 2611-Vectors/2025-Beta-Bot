@@ -232,22 +232,23 @@ public class Vision extends SubsystemBase {
 
   public void calculateCameraPositions(Supplier<Pose2d> robotPoseSupplier) {
     Logger.recordOutput("Vision/AutoCameraConfig/RobotPose", startRobotPose);
-    Logger.recordOutput("Vision/AutoCameraConfig/Camera 0 Current Location/", robotToBackRightCam);
+    Logger.recordOutput("Vision/AutoCameraConfig/Camera 0 Current Location/", robotToBatterySdsCam);
     Logger.recordOutput(
         "Vision/AutoCameraConfig/Camera 0 Current Angles/",
         String.format(
             "roll: %.2f, pitch: %.2f, yaw: %.2f",
-            robotToBackRightCam.getRotation().getMeasureX().magnitude(),
-            robotToBackRightCam.getRotation().getMeasureY().magnitude(),
-            robotToBackRightCam.getRotation().getMeasureZ().magnitude()));
-    Logger.recordOutput("Vision/AutoCameraConfig/Camera 1 Current Location/", robotToFrontLeftCam);
+            robotToBatterySdsCam.getRotation().getMeasureX().magnitude(),
+            robotToBatterySdsCam.getRotation().getMeasureY().magnitude(),
+            robotToBatterySdsCam.getRotation().getMeasureZ().magnitude()));
+    Logger.recordOutput(
+        "Vision/AutoCameraConfig/Camera 1 Current Location/", robotToIntakeElevatorCam);
     Logger.recordOutput(
         "Vision/AutoCameraConfig/Camera 1 Current Angles/",
         String.format(
             "roll: %.2f, pitch: %.2f, yaw: %.2f",
-            robotToFrontLeftCam.getRotation().getMeasureX().magnitude(),
-            robotToFrontLeftCam.getRotation().getMeasureY().magnitude(),
-            robotToFrontLeftCam.getRotation().getMeasureZ().magnitude()));
+            robotToIntakeElevatorCam.getRotation().getMeasureX().magnitude(),
+            robotToIntakeElevatorCam.getRotation().getMeasureY().magnitude(),
+            robotToIntakeElevatorCam.getRotation().getMeasureZ().magnitude()));
     for (int i = 0; i < io.length; i++) {
       HashMap<Integer, Transform3d> robotToCamera = io[i].getCameraRelativeToRobot(inputs[i]);
       Pose2d robotPose =

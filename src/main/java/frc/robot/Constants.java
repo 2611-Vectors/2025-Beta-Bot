@@ -158,44 +158,44 @@ public final class Constants {
     public static final double FIELD_HEIGHT = 8.042;
 
     // Name of the PhotonVision Reef Camera
-    public static String BackRightCam = "BackRightCam";
+    public static String batterySdsCam = "BackRightCam";
 
     // Position of the PhotonVision Reef Camera
-    public static Transform3d robotToBackRightCam =
+    public static Transform3d robotToBatterySdsCam =
         new Transform3d(
-            Units.inchesToMeters(-5.125),
-            Units.inchesToMeters(-4.125),
-            Units.inchesToMeters(8.625),
-            new Rotation3d(0.0, Math.toRadians(0), Math.toRadians(180)));
+            Units.inchesToMeters(-10.7423), // -5.125
+            Units.inchesToMeters(-10.3647), // -4.125
+            Units.inchesToMeters(8.1666), // 8.625
+            new Rotation3d(0.0, Math.toRadians(-45), Math.toRadians(21)));
 
-    public static String BackLeftCam = "BackLeftCam";
+    public static String batteryElevatorCam = "BackLeftCam";
 
     // Position of the PhotonVision Reef Camera
-    public static Transform3d robotToBackLeftCam =
+    public static Transform3d robotToBatteryElevatorCam =
         new Transform3d(
-            Units.inchesToMeters(-11),
-            Units.inchesToMeters(10.5),
-            Units.inchesToMeters(35),
-            new Rotation3d(0.0, Math.toRadians(-1), Math.toRadians(135)));
+            Units.inchesToMeters(-7.8171), // -11
+            Units.inchesToMeters(10.6147), // 10.5
+            Units.inchesToMeters(30.7779),
+            new Rotation3d(0.0, Math.toRadians(0), Math.toRadians(-135)));
 
-    public static String FrontLeftCam = "FrontLeftCam";
+    public static String intakeElevatorCam = "FrontLeftCam";
 
     // Position of the PhotonVision Reef Camera
-    public static Transform3d robotToFrontLeftCam =
+    public static Transform3d robotToIntakeElevatorCam =
         new Transform3d(
-            Units.inchesToMeters(8.25),
-            Units.inchesToMeters(10.5),
-            Units.inchesToMeters(31),
-            new Rotation3d(0.0, Math.toRadians(0), Math.toRadians(-40)));
+            Units.inchesToMeters(7.8987), // 8.25
+            Units.inchesToMeters(10.6535), // 10.5
+            Units.inchesToMeters(30.9704), // 31
+            new Rotation3d(0.0, Math.toRadians(0), Math.toRadians(-45)));
 
-    public static String FrontRightCam = "FrontRightCam";
+    public static String intakeSdsCam = "FrontRightCam";
     // Position of the PhotonVision Reef Camera
-    public static Transform3d robotToFrontRightCam =
+    public static Transform3d robotToIntakeSdsCam =
         new Transform3d(
-            Units.inchesToMeters(11),
-            Units.inchesToMeters(-10.5),
-            Units.inchesToMeters(7.75), // previous value 9
-            new Rotation3d(0.0, Math.toRadians(-20), Math.toRadians(160)));
+            Units.inchesToMeters(11.7838), // 11
+            Units.inchesToMeters(-10.5901), // -10.5
+            Units.inchesToMeters(8.5538), // 7.75
+            new Rotation3d(0.0, Math.toRadians(-20), Math.toRadians(171)));
 
     // Basic filtering thresholds
     public static double maxAmbiguity = 0.2;
