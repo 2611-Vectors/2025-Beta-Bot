@@ -32,6 +32,7 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PID_FF_Tuners;
+import frc.robot.commands.Autons.Test3Piece;
 import frc.robot.commands.ScoringCommands.AlgaeIntake;
 import frc.robot.commands.ScoringCommands.AlgaeScore;
 import frc.robot.commands.ScoringCommands.AlgaeTravelPosition;
@@ -444,9 +445,9 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
-    // return new Test3Piece(m_Elevator, m_Arm, m_EndEffector, m_Climb);
+    return new Test3Piece(m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
-    return CustomAutoBuilder.getAutonCommand(m_Drive);
+    // return CustomAutoBuilder.getAutonCommand(m_Drive);
   }
 
   public void zeroMotors() {

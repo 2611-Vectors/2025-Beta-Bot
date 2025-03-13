@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,6 +31,7 @@ public class Arm extends SubsystemBase {
 
   public final ArmFeedforward armFF = new ArmFeedforward(0.0, 0.0, 0.0);
   LoggedNetworkNumber armKg;
+  private final SlewRateLimiter armSlewRate = new SlewRateLimiter(3);
 
   // This is temp
   LoggedNetworkNumber algaeProccesor_h,
@@ -120,7 +122,7 @@ public class Arm extends SubsystemBase {
           double ffPart =
               armFF.getKg() * Math.cos(Math.toRadians(getPivotAngle())); // armFF.getKg() *
           // Math.cos(Math.toRadians(getPivotAngle()));
-          arm.setVoltage(MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE));
+          arm.setVoltage(armSlewRate.calculate(MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE)));
         });
   }
 
