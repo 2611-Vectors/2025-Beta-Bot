@@ -21,8 +21,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.Mechanisms.Arm;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -171,10 +173,22 @@ public final class Constants {
 
   public static class VisionConstants {
     // Apriltag Field Layout
+
+    public static AprilTagFieldLayout aprilTagLayoutActual = getAprilTagFieldLayout();
+
     public static AprilTagFieldLayout aprilTagLayout =
-        AprilTagFieldLayout.loadField(
-            AprilTagFields
-                .k2025ReefscapeAndyMark); // I think we need to change this to welded for comp
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+
+    public static AprilTagFieldLayout getAprilTagFieldLayout() {
+      try {
+        File file =
+            new File(Filesystem.getDeployDirectory(), "AprilTagFieldLayouts/2025-test.json");
+        return new AprilTagFieldLayout(file.getAbsolutePath());
+      } catch (Exception e) {
+        return AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+      }
+    }
+
     public static final double FIELD_WIDTH = 17.548;
     public static final double FIELD_HEIGHT = 8.042;
 

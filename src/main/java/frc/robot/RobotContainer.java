@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.Autons.Left3Auton;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PID_FF_Tuners;
@@ -126,6 +125,18 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(
                     VisionConstants.batterySdsCam,
                     VisionConstants.robotToBatterySdsCam,
+                    m_Drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.batteryElevatorCam,
+                    VisionConstants.robotToBatteryElevatorCam,
+                    m_Drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.intakeSdsCam,
+                    VisionConstants.robotToIntakeSdsCam,
+                    m_Drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.intakeElevatorCam,
+                    VisionConstants.robotToIntakeElevatorCam,
                     m_Drive::getPose));
         break;
 
@@ -434,7 +445,8 @@ public class RobotContainer {
     m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
     // return new Test3Piece(m_Elevator, m_Arm, m_EndEffector, m_Climb);
-    return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
+    // return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
+    return CustomAutoBuilder.getAutonCommand(m_Drive);
   }
 
   public void zeroMotors() {
