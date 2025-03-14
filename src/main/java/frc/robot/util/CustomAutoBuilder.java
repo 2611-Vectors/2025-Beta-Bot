@@ -132,7 +132,7 @@ public class CustomAutoBuilder {
             startChooser.get(),
             applyOffset(scoreChoosers[0].get(), lateralChoosers[0].get()),
             4,
-            2.8);
+            2.7);
 
     paths.add(startPath.getPathPoses().toArray(new Pose2d[startPath.getPathPoses().size()]));
     autonPath = Commands.sequence(trajectoryDisplay(startPath), AutoBuilder.followPath(startPath));

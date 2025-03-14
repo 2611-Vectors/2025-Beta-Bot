@@ -14,6 +14,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.MechanismSimulator;
 import frc.robot.util.MechanismSimulatorActual;
@@ -27,36 +28,16 @@ public class Arm extends SubsystemBase {
   private final TalonFX arm = new TalonFX(ARM_MOTOR_ID);
 
   DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(ARM_ENCODER_PORT);
-  TunablePIDController armPID = new TunablePIDController(0.2, 0.0, 0.0, "/Testing/ArmPID/");
+  TunablePIDController armPID = new TunablePIDController(0.15, 0.0, 0.0, "/Testing/ArmPID/");
 
   public final ArmFeedforward armFF = new ArmFeedforward(0.0, 0.0, 0.0);
   LoggedNetworkNumber armKg;
-  private final SlewRateLimiter armSlewRate = new SlewRateLimiter(3);
-
-  // This is temp
-  LoggedNetworkNumber algaeProccesor_h,
-      algaeP2_h,
-      algaeP3_h,
-      algaeProccesor_a,
-      algaeP2_a,
-      algaeP3_a,
-      algaeSpeed;
+  private final SlewRateLimiter armSlewRate = new SlewRateLimiter(50);
 
   /** Creates a new Arm. */
   public Arm() {
     PhoenixUtil.configMotor(arm, false, NeutralModeValue.Brake);
     armPID.enableContinuousInput(-180, 180);
-    // This is temp
-    algaeProccesor_h =
-        new LoggedNetworkNumber("SetpointTuning/Proccessor Height", PROCESSOR_HEIGHT);
-    algaeProccesor_a = new LoggedNetworkNumber("SetpointTuning/Proccessor Angle", PROCCESOR_ANGLE);
-
-    algaeP2_h = new LoggedNetworkNumber("SetpointTuning/Algae Pick 2 Height", ALGAE_PICK2_HEIGHT);
-    algaeP2_a = new LoggedNetworkNumber("SetpointTuning/Algae Pick 2 Angle", ALGAE_PICK2_ANGLE);
-
-    algaeP3_h = new LoggedNetworkNumber("SetpointTuning/Algae Pick 3 Height", ALGAE_PICK3_HEIGHT);
-    algaeP3_a = new LoggedNetworkNumber("SetpointTuning/Algae Pick 3 Angle", ALGAE_PICK3_ANGLE);
-    algaeSpeed = new LoggedNetworkNumber("SetpointTunning/AlgaeSpeed", ALGAE_INTAKE_SPEED);
 
     armKg = new LoggedNetworkNumber("Arm/Arm kG", 0.0);
   }
@@ -112,18 +93,31 @@ public class Arm extends SubsystemBase {
    * Sets the Arm Pivot to a target position and should be called periodically unit are in degrees
    */
   public Command setPivotAngle(Supplier<Double> angle) {
-    return run(
-        () -> {
-          Logger.recordOutput("Arm/TargetAngle", angle.get());
-          MechanismSimulator.updateArm(angle.get());
+    return Commands.sequence(
+        runOnce(() -> armSlewRate.reset(0)),
+        run(
+            () -> {
+              Logger.recordOutput("Arm/TargetAngle", angle.get());
+              MechanismSimulator.updateArm(angle.get());
 
-          double pidPart;
-          pidPart = armPID.calculate(getPivotAngle(), angle.get());
-          double ffPart =
-              armFF.getKg() * Math.cos(Math.toRadians(getPivotAngle())); // armFF.getKg() *
-          // Math.cos(Math.toRadians(getPivotAngle()));
-          arm.setVoltage(armSlewRate.calculate(MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE)));
-        });
+              double pidPart;
+              pidPart = armPID.calculate(getPivotAngle(), angle.get());
+              double ffPart =
+                  armFF.getKg() * Math.cos(Math.toRadians(getPivotAngle())); // armFF.getKg() *
+              // Math.cos(Math.toRadians(getPivotAngle()));
+              Logger.recordOutput(
+                  "Arm/Arm Voltage",
+                  armSlewRate.calculate(
+                      MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE)));
+
+              // if (Arm.getRelativeAngle(angle.get(), getPivotAngle()) < ANGLE_TOLERANCE) {
+              //   armSlewRate.reset(
+              //       MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE));
+              // }
+              arm.setVoltage(
+                  armSlewRate.calculate(
+                      MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE)));
+            }));
   }
 
   @Override
@@ -133,18 +127,6 @@ public class Arm extends SubsystemBase {
     Logger.recordOutput("Arm/Motor Position", arm.getPosition().getValueAsDouble());
     MechanismSimulatorActual.updateArm(getPivotAngle());
     armPID.update();
-
-    // This is temp
-    PROCESSOR_HEIGHT = algaeProccesor_h.get();
-    PROCCESOR_ANGLE = algaeProccesor_a.get();
-
-    ALGAE_PICK2_ANGLE = algaeP2_a.get();
-    ALGAE_PICK2_HEIGHT = algaeP2_h.get();
-
-    ALGAE_PICK3_ANGLE = algaeP3_a.get();
-    ALGAE_PICK3_HEIGHT = algaeP3_h.get();
-
-    ALGAE_INTAKE_SPEED = algaeSpeed.get();
 
     armFF.setKg(armKg.get());
   }

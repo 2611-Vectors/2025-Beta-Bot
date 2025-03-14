@@ -56,10 +56,10 @@ public final class Constants {
   public static class ArmConstants {
     public static final int ARM_MOTOR_ID = 44;
     public static final int ARM_ENCODER_PORT = 0;
-    public static final int PIVOT_ANGLE_OFFSET = 19;
+    public static final int PIVOT_ANGLE_OFFSET = -6;
 
     public static final double ARM_GEAR_RATIO = 43.95;
-    public static final double ARM_MAX_VOLTAGE = 4.0; // Set this to 8 for competition
+    public static final double ARM_MAX_VOLTAGE = 5.0; // Set this to 8 for competition
     public static final double ARM_LENGTH = 0.6;
 
     public static final int END_EFFECTOR_ID = 43;
@@ -90,14 +90,14 @@ public final class Constants {
   public static class Setpoints {
     public static final double HOME_HEIGHT_IN = 25.0;
     public static final double TRAVEL_HEIGHT_IN = 25.0;
-    public static final double L2_HEIGHT_IN = 24.0;
-    public static final double L3_HEIGHT_IN = 40.0;
+    public static final double L2_HEIGHT_IN = 23.0; // was 24
+    public static final double L3_HEIGHT_IN = 38; // was 40
     public static final double L4_HEIGHT_IN = 67.0;
-    public static final double INTAKE_HEIGHT_IN = 53.25;
-    public static double ALGAE_PICK2_HEIGHT = 32.0;
-    public static double ALGAE_PICK3_HEIGHT = 48.0;
-    public static double PROCESSOR_HEIGHT = 27.0;
-    public static double CLIMB_HEIGHT_IN = 15.0;
+    public static final double INTAKE_HEIGHT_IN = 53; // was 53.25
+    public static final double ALGAE_PICK2_HEIGHT = 32.0;
+    public static final double ALGAE_PICK3_HEIGHT = 48.0;
+    public static final double PROCESSOR_HEIGHT = 27.0;
+    public static final double CLIMB_HEIGHT_IN = 15.0;
 
     public static final double HOME_ANGLE = -101;
     public static final double TRAVEL_ANGLE = -101;
@@ -105,12 +105,12 @@ public final class Constants {
     public static final double L3_ANGLE = -55;
     public static final double L4_ANGLE = -40;
     public static final double INTAKE_ANGLE = Arm.flipAngle(60);
-    public static double ALGAE_PICK2_ANGLE = 130;
-    public static double ALGAE_PICK3_ANGLE = 130;
-    public static double PROCCESOR_ANGLE = 180;
-    public static double CLIMB_ANGLE = -30;
+    public static final double ALGAE_PICK2_ANGLE = 130;
+    public static final double ALGAE_PICK3_ANGLE = 130;
+    public static final double PROCCESOR_ANGLE = 180;
+    public static final double CLIMB_ANGLE = -30;
 
-    public static double ALGAE_INTAKE_SPEED = 8;
+    public static final double ALGAE_INTAKE_SPEED = 8;
 
     public static final double POSITION_TOLERANCE = 1.0;
     public static final double ANGLE_TOLERANCE = 3.0;
@@ -121,7 +121,7 @@ public final class Constants {
 
     public static final Pose2d START_LEFT = new Pose2d(6.8, 6.0, Rotation2d.fromDegrees(60));
     public static final Pose2d START_CENTER = new Pose2d(7.200, 4.000, Rotation2d.fromDegrees(0));
-    public static final Pose2d START_RIGHT = new Pose2d(7.200, 1.900, Rotation2d.fromDegrees(-60));
+    public static final Pose2d START_RIGHT = new Pose2d(6.8, 2.0, Rotation2d.fromDegrees(-60));
 
     public static final Pose2d AB = new Pose2d(3.2512, 4.0259, Rotation2d.fromDegrees(180));
     public static final Pose2d CD = new Pose2d(3.8707, 2.9543, Rotation2d.fromDegrees(-120));

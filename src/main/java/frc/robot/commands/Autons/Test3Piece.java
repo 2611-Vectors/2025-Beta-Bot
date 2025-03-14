@@ -39,6 +39,7 @@ public class Test3Piece extends SequentialCommandGroup {
                 AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
                 scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[1], drivePaths[2]),
                 scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[3], drivePaths[4]),
+                Commands.waitSeconds(0.25),
                 m_Arm
                     .setPivotAngle(() -> TRAVEL_ANGLE)
                     .until(
@@ -104,11 +105,11 @@ public class Test3Piece extends SequentialCommandGroup {
             .until(
                 () ->
                     Math.abs(Arm.getRelativeAngle(angle, m_Arm.getPivotAngle())) < ANGLE_TOLERANCE),
-        m_EndEffector.setEndEffectorVoltage(() -> 10.0),
+        m_EndEffector.setEndEffectorVoltage(() -> 11.0),
         Commands.race(
             m_Elevator.setElevatorPosition(() -> height),
             m_Arm.setPivotAngle(() -> angle),
-            Commands.waitSeconds(0.3)) // ,
+            new WaitCommand(0.1)) // ,
         // Commands.race(
         //         m_Elevator.setElevatorPosition(() -> height),
         //         m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))

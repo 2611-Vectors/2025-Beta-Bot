@@ -34,7 +34,7 @@ public class LoadStationIntake extends SequentialCommandGroup {
             Commands.sequence(
                 m_EndEffector.setEndEffectorVoltage(() -> -6.0),
                 Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) > 44),
-                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) < 32),
+                Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) < 31),
                 m_EndEffector.setEndEffectorVoltage(() -> 0.0))));
   }
 }
