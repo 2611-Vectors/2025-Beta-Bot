@@ -154,6 +154,7 @@ public class RobotContainer {
         break;
     }
 
+    // region Subsystem init
     m_Elevator = new Elevator();
     m_Arm = new Arm();
     m_EndEffector = new EndEffector();
@@ -229,6 +230,7 @@ public class RobotContainer {
   private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.1);
 
   private void configureTestBindings() {
+    // region TestBindings
     // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
     // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
     // m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
@@ -242,13 +244,6 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    m_Drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            m_Drive,
-            () -> -slewRateX.calculate(controller.getLeftY()),
-            () -> -slewRateY.calculate(controller.getLeftX()),
-            () -> -controller.getRightX()));
 
     // CLIMB CONTROLS
     // new Trigger(() -> buttonBoard.getRightY() > -0.6)
@@ -281,6 +276,7 @@ public class RobotContainer {
         .whileTrue(Commands.run(() -> m_EndEffector.setVoltage(-6)))
         .onFalse(Commands.runOnce(() -> m_EndEffector.setVoltage(0)));
 
+    // region TeleOp Setpoints
     buttonBoard
         .x()
         .whileTrue(
@@ -394,6 +390,16 @@ public class RobotContainer {
     //     .whileFalse
     m_Climb.setDefaultCommand(m_Climb.runWinch(() -> buttonBoard.getRightY()));
 
+    // region Driver 1 controllers
+    // Default command, normal field-relative drive
+    m_Drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            m_Drive,
+            () -> -slewRateX.calculate(controller.getLeftY()),
+            () -> -slewRateY.calculate(controller.getLeftX()),
+            () -> -controller.getRightX()));
+
+
     // Lock to 0° when A button is held
     controller
         .a()
@@ -425,6 +431,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    // region Auton Command
     m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
     return new Test3Piece(m_Elevator, m_Arm, m_EndEffector, m_Climb);
