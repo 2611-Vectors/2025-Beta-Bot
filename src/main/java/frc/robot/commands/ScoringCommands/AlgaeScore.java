@@ -28,23 +28,13 @@ public class AlgaeScore extends SequentialCommandGroup {
             .onlyIf(
                 () -> Math.abs(Arm.getRelativeAngle(PROCCESOR_ANGLE, m_Arm.getPivotAngle())) > 10),
         Commands.race(
-            m_Arm
-                .setPivotAngle(() -> PROCCESOR_ANGLE)
-                .until(
-                    () ->
-                        Math.abs(Arm.getRelativeAngle(PROCCESOR_ANGLE, m_Arm.getPivotAngle()))
-                            < ANGLE_TOLERANCE),
+            m_Arm.setUntil(() -> PROCCESOR_ANGLE),
             m_Elevator.holdElevator()),
         Commands.race(
-            m_Elevator
-                .setElevatorPosition(() -> PROCESSOR_HEIGHT)
-                .until(
-                    () ->
-                        Math.abs(PROCESSOR_HEIGHT - m_Elevator.getElevatorPosition())
-                            < POSITION_TOLERANCE),
+            m_Elevator.setUntil(() -> PROCESSOR_HEIGHT),
             m_Arm.setPivotAngle(() -> PROCCESOR_ANGLE)),
         Commands.parallel(
-            new HoldPosition(m_Elevator, m_Arm, m_EndEffector, height, angle, -ALGAE_INTAKE_SPEED),
+            new HoldPosition(m_Elevator, m_Arm, height, angle),
             m_EndEffector.setEndEffectorVoltage(() -> -ALGAE_INTAKE_SPEED)));
   }
 }

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /** Add your docs here. */
-public class MechanismSimulatorActual {
+public class MechanismActual {
   static Mechanism2d elevatorMech = new Mechanism2d(3, 3);
   static MechanismRoot2d elevatorRoot = elevatorMech.getRoot("Elevator", 1.5, 0);
   static MechanismLigament2d m_elevator =

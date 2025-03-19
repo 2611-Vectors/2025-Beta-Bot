@@ -28,7 +28,7 @@ public class L1Scoring extends SequentialCommandGroup {
     super(
         Commands.race(
             m_Elevator
-                .setElevatorPosition(() -> 40.0)
+                .setUntil(() -> 40.0)
                 .until(() -> Math.abs(40 - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
             m_Arm.setPivotAngle(() -> TRAVEL_ANGLE)),
         m_Arm

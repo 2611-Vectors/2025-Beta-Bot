@@ -154,6 +154,7 @@ public class RobotContainer {
         break;
     }
 
+    // region Subsystem init
     m_Elevator = new Elevator();
     m_Arm = new Arm();
     m_EndEffector = new EndEffector();
@@ -229,6 +230,7 @@ public class RobotContainer {
   private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.1);
 
   private void configureTestBindings() {
+    // region TestBindings
     // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
     // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
     // m_Elevator.setDefaultCommand(PID_FF_Tuners.ElevatorPIDTuning(m_Elevator));
@@ -242,13 +244,6 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    m_Drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            m_Drive,
-            () -> -slewRateX.calculate(controller.getLeftY()),
-            () -> -slewRateY.calculate(controller.getLeftX()),
-            () -> -controller.getRightX()));
 
     // CLIMB CONTROLS
     // new Trigger(() -> buttonBoard.getRightY() > -0.6)
@@ -281,6 +276,7 @@ public class RobotContainer {
         .whileTrue(Commands.run(() -> m_EndEffector.setVoltage(-6)))
         .onFalse(Commands.runOnce(() -> m_EndEffector.setVoltage(0)));
 
+    // region TeleOp Setpoints
     buttonBoard
         .x()
         .whileTrue(
@@ -295,13 +291,7 @@ public class RobotContainer {
                             ALGAE_PICK2_ANGLE),
                         new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE)
                             .andThen(
-                                new HoldPosition(
-                                    m_Elevator,
-                                    m_Arm,
-                                    m_EndEffector,
-                                    L2_HEIGHT_IN,
-                                    TRAVEL_ANGLE,
-                                    0)),
+                                new HoldPosition(m_Elevator, m_Arm, L2_HEIGHT_IN, TRAVEL_ANGLE)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
@@ -322,9 +312,7 @@ public class RobotContainer {
                         new AlgaeScore(
                             m_Elevator, m_Arm, m_EndEffector, PROCESSOR_HEIGHT, PROCCESOR_ANGLE),
                         new L1Scoring(m_Elevator, m_Arm, m_EndEffector)
-                            .andThen(
-                                new HoldPosition(
-                                    m_Elevator, m_Arm, m_EndEffector, 40.0, TRAVEL_ANGLE, 0)),
+                            .andThen(new HoldPosition(m_Elevator, m_Arm, 40.0, TRAVEL_ANGLE)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
@@ -352,13 +340,7 @@ public class RobotContainer {
                             ALGAE_PICK3_ANGLE),
                         new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE)
                             .andThen(
-                                new HoldPosition(
-                                    m_Elevator,
-                                    m_Arm,
-                                    m_EndEffector,
-                                    L3_HEIGHT_IN,
-                                    TRAVEL_ANGLE,
-                                    0)),
+                                new HoldPosition(m_Elevator, m_Arm, L3_HEIGHT_IN, TRAVEL_ANGLE)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
@@ -374,18 +356,14 @@ public class RobotContainer {
         .y()
         .whileTrue(
             new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE)
-                .andThen(
-                    new HoldPosition(
-                        m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, TRAVEL_ANGLE, 0)))
+                .andThen(new HoldPosition(m_Elevator, m_Arm, L4_HEIGHT_IN, TRAVEL_ANGLE)))
         .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
     new Trigger(() -> buttonBoard.getLeftY() > 0.6)
         .and(() -> !manualMode)
         .whileTrue(
             new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector)
-                .andThen(
-                    new HoldPosition(
-                        m_Elevator, m_Arm, m_EndEffector, INTAKE_HEIGHT_IN, INTAKE_ANGLE, 0)))
+                .andThen(new HoldPosition(m_Elevator, m_Arm, INTAKE_HEIGHT_IN, INTAKE_ANGLE)))
         .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
     SmartDashboard.putBoolean("Manual Mode", manualMode);
@@ -411,6 +389,16 @@ public class RobotContainer {
     //                 () -> -buttonBoard.getLeftY() + m_Elevator.elevatorFF.getKg())))
     //     .whileFalse
     m_Climb.setDefaultCommand(m_Climb.runWinch(() -> buttonBoard.getRightY()));
+
+    // region Driver 1 controllers
+    // Default command, normal field-relative drive
+    m_Drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            m_Drive,
+            () -> -slewRateX.calculate(controller.getLeftY()),
+            () -> -slewRateY.calculate(controller.getLeftX()),
+            () -> -controller.getRightX()));
+
 
     // Lock to 0° when A button is held
     controller
@@ -443,6 +431,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    // region Auton Command
     m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
     return new Test3Piece(m_Drive, m_Elevator, m_Arm, m_EndEffector, m_Climb);

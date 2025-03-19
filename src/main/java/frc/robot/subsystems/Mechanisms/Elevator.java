@@ -17,8 +17,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.MechanismSimulator;
-import frc.robot.util.MechanismSimulatorActual;
+import frc.robot.util.MechanismTarget;
+import frc.robot.util.MechanismActual;
 import frc.robot.util.PhoenixUtil;
 import frc.robot.util.TunablePIDController;
 import java.util.function.Supplier;
@@ -60,16 +60,14 @@ public class Elevator extends SubsystemBase {
   public Command setVoltage(Supplier<Double> voltage) {
     return run(
         () -> {
-          leftMotor.setVoltage(voltage.get());
-          rightMotor.setVoltage(voltage.get());
+          setVoltage(voltage.get());
         });
   }
 
   public Command holdElevator() {
     return run(
         () -> {
-          leftMotor.setVoltage(elevatorFF.getKg());
-          rightMotor.setVoltage(elevatorFF.getKg());
+          setVoltage(elevatorFF.getKg());
         });
   }
 
@@ -84,11 +82,7 @@ public class Elevator extends SubsystemBase {
           Logger.recordOutput("Elevator/TargetPosition", targetActual);
 
           // // Simulator update
-          MechanismSimulator.updateElevator(targetActual);
-          // if (!MechanismSimulator.isLegalTarget()) {
-          //   double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
-          //   targetActual += offset;
-          // }
+          MechanismTarget.updateElevator(targetActual);
 
           double pidPart = elevatorPID.calculate(getElevatorPosition(), targetActual);
           double ffPart = elevatorFF.calculate(targetActual);
@@ -122,7 +116,7 @@ public class Elevator extends SubsystemBase {
           Logger.recordOutput("Elevator/TargetPosition", targetActual);
 
           // // Simulator update
-          MechanismSimulator.updateElevator(targetActual);
+          MechanismTarget.updateElevator(targetActual);
           // if (!MechanismSimulator.isLegalTarget()) {
           //   double offset = LOWEST_HEIGHT - MechanismSimulator.targetArmHeight();
           //   targetActual += offset;
@@ -161,6 +155,11 @@ public class Elevator extends SubsystemBase {
     return () -> (Math.abs(30d - getElevatorPosition()) < POSITION_TOLERANCE);
   }
 
+  public Command setUntil(Supplier<Double> target) {
+    return setElevatorPosition(target)
+        .until(() -> Math.abs(target.get() - getElevatorPosition()) < POSITION_TOLERANCE);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -173,7 +172,7 @@ public class Elevator extends SubsystemBase {
         "Elevator/Right Elevator Supplied Current",
         rightMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Elevator/Current Position", getElevatorPosition());
-    MechanismSimulatorActual.updateElevator(getElevatorPosition());
+    MechanismActual.updateElevator(getElevatorPosition());
     elevatorPID.update();
   }
 }

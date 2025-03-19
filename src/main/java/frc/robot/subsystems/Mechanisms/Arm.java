@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.MechanismSimulator;
-import frc.robot.util.MechanismSimulatorActual;
+import frc.robot.util.MechanismActual;
+import frc.robot.util.MechanismTarget;
 import frc.robot.util.PhoenixUtil;
 import frc.robot.util.TunablePIDController;
 import java.util.function.Supplier;
@@ -98,7 +98,7 @@ public class Arm extends SubsystemBase {
         run(
             () -> {
               Logger.recordOutput("Arm/TargetAngle", angle.get());
-              MechanismSimulator.updateArm(angle.get());
+              MechanismTarget.updateArm(angle.get());
 
               double pidPart;
               pidPart = armPID.calculate(getPivotAngle(), angle.get());
@@ -120,12 +120,18 @@ public class Arm extends SubsystemBase {
             }));
   }
 
+  public Command setUntil(Supplier<Double> target) {
+    return setPivotAngle(target)
+        .until(
+            () -> Math.abs(Arm.getRelativeAngle(target.get(), getPivotAngle())) < ANGLE_TOLERANCE);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     Logger.recordOutput("Arm/current angle", getPivotAngle());
     Logger.recordOutput("Arm/Motor Position", arm.getPosition().getValueAsDouble());
-    MechanismSimulatorActual.updateArm(getPivotAngle());
+    MechanismActual.updateArm(getPivotAngle());
     armPID.update();
 
     armFF.setKg(armKg.get());

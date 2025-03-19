@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Elevator;
-import frc.robot.subsystems.Mechanisms.EndEffector;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -18,14 +17,10 @@ public class HoldPosition extends SequentialCommandGroup {
   public HoldPosition(
       Elevator m_Elevator,
       Arm m_Arm,
-      EndEffector m_EndEffector,
       double height,
-      double angle,
-      double voltage) {
+      double angle) {
     super(
         Commands.parallel(
-            m_Arm.setPivotAngle(() -> angle), m_Elevator.setElevatorPosition(() -> height) // ,
-            // m_EndEffector.setEndEffectorVoltage(() -> voltage
-            ));
+            m_Arm.setPivotAngle(() -> angle), m_Elevator.setElevatorPosition(() -> height)));
   }
 }
