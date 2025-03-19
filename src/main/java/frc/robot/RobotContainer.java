@@ -295,13 +295,7 @@ public class RobotContainer {
                             ALGAE_PICK2_ANGLE),
                         new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L2_HEIGHT_IN, L2_ANGLE)
                             .andThen(
-                                new HoldPosition(
-                                    m_Elevator,
-                                    m_Arm,
-                                    m_EndEffector,
-                                    L2_HEIGHT_IN,
-                                    TRAVEL_ANGLE,
-                                    0)),
+                                new HoldPosition(m_Elevator, m_Arm, L2_HEIGHT_IN, TRAVEL_ANGLE)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
@@ -322,9 +316,7 @@ public class RobotContainer {
                         new AlgaeScore(
                             m_Elevator, m_Arm, m_EndEffector, PROCESSOR_HEIGHT, PROCCESOR_ANGLE),
                         new L1Scoring(m_Elevator, m_Arm, m_EndEffector)
-                            .andThen(
-                                new HoldPosition(
-                                    m_Elevator, m_Arm, m_EndEffector, 40.0, TRAVEL_ANGLE, 0)),
+                            .andThen(new HoldPosition(m_Elevator, m_Arm, 40.0, TRAVEL_ANGLE)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
@@ -352,13 +344,7 @@ public class RobotContainer {
                             ALGAE_PICK3_ANGLE),
                         new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L3_HEIGHT_IN, L3_ANGLE)
                             .andThen(
-                                new HoldPosition(
-                                    m_Elevator,
-                                    m_Arm,
-                                    m_EndEffector,
-                                    L3_HEIGHT_IN,
-                                    TRAVEL_ANGLE,
-                                    0)),
+                                new HoldPosition(m_Elevator, m_Arm, L3_HEIGHT_IN, TRAVEL_ANGLE)),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)))
         .onFalse(
@@ -374,18 +360,14 @@ public class RobotContainer {
         .y()
         .whileTrue(
             new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE)
-                .andThen(
-                    new HoldPosition(
-                        m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, TRAVEL_ANGLE, 0)))
+                .andThen(new HoldPosition(m_Elevator, m_Arm, L4_HEIGHT_IN, TRAVEL_ANGLE)))
         .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
     new Trigger(() -> buttonBoard.getLeftY() > 0.6)
         .and(() -> !manualMode)
         .whileTrue(
             new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector)
-                .andThen(
-                    new HoldPosition(
-                        m_Elevator, m_Arm, m_EndEffector, INTAKE_HEIGHT_IN, INTAKE_ANGLE, 0)))
+                .andThen(new HoldPosition(m_Elevator, m_Arm, INTAKE_HEIGHT_IN, INTAKE_ANGLE)))
         .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
     SmartDashboard.putBoolean("Manual Mode", manualMode);

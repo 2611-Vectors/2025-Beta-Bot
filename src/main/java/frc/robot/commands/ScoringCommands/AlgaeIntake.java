@@ -5,7 +5,6 @@
 package frc.robot.commands.ScoringCommands;
 
 import static frc.robot.Constants.Setpoints.ALGAE_INTAKE_SPEED;
-import static frc.robot.Constants.Setpoints.POSITION_TOLERANCE;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,12 +20,10 @@ public class AlgaeIntake extends SequentialCommandGroup {
   public AlgaeIntake(
       Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, double height, double angle) {
     super(
-        m_Elevator
-            .setElevatorPosition(() -> height)
-            .until(() -> Math.abs(height - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
-        Commands.parallel(
-                m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle))
-            .until(() -> Math.abs(Arm.getRelativeAngle(height, m_Arm.getPivotAngle())) < angle),
+        m_Elevator.setUntil(() -> height),
+        Commands.race(
+            m_Elevator.setElevatorPosition(() -> height), 
+            m_Arm.setUntil(() -> angle)),
         Commands.parallel(
             m_Arm.setPivotAngle(() -> angle),
             m_Elevator.setElevatorPosition(() -> height),

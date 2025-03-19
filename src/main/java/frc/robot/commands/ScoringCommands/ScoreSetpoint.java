@@ -19,17 +19,8 @@ public class ScoreSetpoint extends SequentialCommandGroup {
         m_Elevator
             .setElevatorPosition(() -> height)
             .until(() -> (m_Elevator.getElevatorPosition() > 30d || height < 30)),
-        Commands.race(
-            m_Elevator
-                .setElevatorPosition(() -> height)
-                .until(
-                    () -> Math.abs(height - m_Elevator.getElevatorPosition()) < POSITION_TOLERANCE),
-            m_Arm.setPivotAngle(() -> TRAVEL_ANGLE)),
-        Commands.parallel(
-                m_Elevator.setElevatorPosition(() -> height), m_Arm.setPivotAngle(() -> angle))
-            .until(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(angle, m_Arm.getPivotAngle())) < ANGLE_TOLERANCE),
+        Commands.race(m_Elevator.setUntil(() -> height), m_Arm.setPivotAngle(() -> TRAVEL_ANGLE)),
+        Commands.race(m_Elevator.setElevatorPosition(() -> height), m_Arm.setUntil(() -> angle)),
         m_EndEffector.setEndEffectorVoltage(() -> 2.0),
         Commands.race(
             m_Elevator.setElevatorPosition(() -> height),
@@ -37,11 +28,7 @@ public class ScoreSetpoint extends SequentialCommandGroup {
             Commands.waitSeconds(0.25)),
         Commands.race(
                 m_Elevator.setElevatorPosition(() -> height),
-                m_Arm.setPivotAngle(() -> TRAVEL_ANGLE))
-            .until(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(TRAVEL_ANGLE, m_Arm.getPivotAngle()))
-                        < ANGLE_TOLERANCE),
+                m_Arm.setUntil(() -> TRAVEL_ANGLE)),
         m_EndEffector.setEndEffectorVoltage(() -> 0.0));
   }
 }

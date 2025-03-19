@@ -18,14 +18,10 @@ public class HoldPosition extends SequentialCommandGroup {
   public HoldPosition(
       Elevator m_Elevator,
       Arm m_Arm,
-      EndEffector m_EndEffector,
       double height,
-      double angle,
-      double voltage) {
+      double angle) {
     super(
         Commands.parallel(
-            m_Arm.setPivotAngle(() -> angle), m_Elevator.setElevatorPosition(() -> height) // ,
-            // m_EndEffector.setEndEffectorVoltage(() -> voltage
-            ));
+            m_Arm.setPivotAngle(() -> angle), m_Elevator.setElevatorPosition(() -> height)));
   }
 }

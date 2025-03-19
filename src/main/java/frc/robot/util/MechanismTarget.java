@@ -18,7 +18,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 // COMBINE WITH MECHANISMsIMULATORaCTUAL
 
 /** Add your docs here. */
-public class MechanismSimulator {
+public class MechanismTarget {
   /* Units in Meters */
 
   static Mechanism2d elevatorMech = new Mechanism2d(3, 3);

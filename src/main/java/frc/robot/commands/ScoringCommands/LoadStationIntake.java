@@ -16,18 +16,10 @@ public class LoadStationIntake extends SequentialCommandGroup {
   public LoadStationIntake(Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector) {
     super(
         m_Elevator
-            .setElevatorPosition(() -> INTAKE_HEIGHT_IN)
-            .until(
-                () ->
-                    Math.abs(INTAKE_HEIGHT_IN - m_Elevator.getElevatorPosition())
-                        < POSITION_TOLERANCE),
-        Commands.parallel(
+            .setUntil(() -> INTAKE_HEIGHT_IN),
+        Commands.race(
                 m_Elevator.setElevatorPosition(() -> INTAKE_HEIGHT_IN),
-                m_Arm.setPivotAngle(() -> INTAKE_ANGLE))
-            .until(
-                () ->
-                    Math.abs(Arm.getRelativeAngle(INTAKE_ANGLE, m_Arm.getPivotAngle()))
-                        < ANGLE_TOLERANCE),
+                m_Arm.setUntil(() -> INTAKE_ANGLE)),
         Commands.race(
             m_Arm.setPivotAngle(() -> INTAKE_ANGLE),
             m_Elevator.setElevatorPosition(() -> INTAKE_HEIGHT_IN),
