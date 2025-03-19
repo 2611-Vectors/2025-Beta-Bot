@@ -124,6 +124,12 @@ public class CustomAutoBuilder {
 
   public static ArrayList<Command> drivePaths;
 
+  public static Command generateInitialPath(Pose2d startingPose) {
+    return AutoBuilder.followPath(
+        getPathFromPoints(
+            startingPose, applyOffset(scoreChoosers[0].get(), lateralChoosers[0].get())));
+  }
+
   public static void update() {
     ArrayList<Pose2d[]> paths = new ArrayList<>();
     drivePaths = new ArrayList<>();

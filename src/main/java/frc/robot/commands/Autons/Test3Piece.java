@@ -18,12 +18,15 @@ import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.Mechanisms.Climb;
 import frc.robot.subsystems.Mechanisms.Elevator;
 import frc.robot.subsystems.Mechanisms.EndEffector;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.CustomAutoBuilder;
 
 public class Test3Piece extends SequentialCommandGroup {
 
   /** Creates a new L4Auton. */
-  public Test3Piece(Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, Climb m_Climb) {
+  public Test3Piece(
+      Drive m_Drive, Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, Climb m_Climb) {
+    Command startPath = CustomAutoBuilder.generateInitialPath(m_Drive.getPose());
     Command[] drivePaths = CustomAutoBuilder.getDrivePaths();
     addCommands(
         Commands.parallel(
@@ -33,7 +36,7 @@ public class Test3Piece extends SequentialCommandGroup {
             Commands.sequence(
                 Commands.runOnce(() -> elevatorSlewRate.reset(m_Elevator.getElevatorPosition())),
                 Commands.race(
-                    drivePaths[0],
+                    startPath,
                     m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
                     m_Elevator.setElevatorPosition(() -> getElevatorPosition(L4_HEIGHT_IN))),
                 AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
