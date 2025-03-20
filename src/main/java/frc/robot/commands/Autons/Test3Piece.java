@@ -73,7 +73,7 @@ public class Test3Piece extends SequentialCommandGroup {
             Commands.sequence(
                 Commands.race(
                     new WaitCommand(0.5),
-                    m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
+                    m_Arm.setSlowPivotAngle(() -> TRAVEL_ANGLE),
                     m_Elevator.holdElevator()),
                 Commands.runOnce(() -> elevatorSlewRate.reset(m_Elevator.getElevatorPosition())),
                 Commands.race(

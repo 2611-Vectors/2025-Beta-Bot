@@ -120,6 +120,31 @@ public class Arm extends SubsystemBase {
             }));
   }
 
+  public Command setSlowPivotAngle(Supplier<Double> angle) {
+    return Commands.sequence(
+        runOnce(() -> armSlewRate.reset(0)),
+        run(
+            () -> {
+              Logger.recordOutput("Arm/TargetAngle", angle.get());
+              MechanismTarget.updateArm(angle.get());
+
+              double pidPart;
+              pidPart = armPID.calculate(getPivotAngle(), angle.get());
+              double ffPart =
+                  armFF.getKg() * Math.cos(Math.toRadians(getPivotAngle())); // armFF.getKg() *
+              // Math.cos(Math.toRadians(getPivotAngle()));
+              Logger.recordOutput(
+                  "Arm/Arm Voltage",
+                  armSlewRate.calculate(MathUtil.clamp(pidPart + ffPart, -2, 2)));
+
+              // if (Arm.getRelativeAngle(angle.get(), getPivotAngle()) < ANGLE_TOLERANCE) {
+              //   armSlewRate.reset(
+              //       MathUtil.clamp(pidPart + ffPart, -ARM_MAX_VOLTAGE, ARM_MAX_VOLTAGE));
+              // }
+              arm.setVoltage(armSlewRate.calculate(MathUtil.clamp(pidPart + ffPart, -2, 2)));
+            }));
+  }
+
   public Command setUntil(Supplier<Double> target) {
     return setPivotAngle(target)
         .until(

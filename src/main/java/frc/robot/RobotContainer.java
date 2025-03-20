@@ -367,10 +367,10 @@ public class RobotContainer {
     new Trigger(() -> buttonBoard.getLeftY() > 0.6)
         .and(() -> !manualMode)
         .whileTrue(
-            new LoadStationIntake(buttonBoard::setRumble, m_Elevator, m_Arm, m_EndEffector)
+            new LoadStationIntake(null, m_Elevator, m_Arm, m_EndEffector)
                 .andThen(new HoldPosition(m_Elevator, m_Arm, INTAKE_HEIGHT_IN, INTAKE_ANGLE)))
         .onFalse(
-            Commands.runOnce(() -> buttonBoard.setRumble(RumbleType.kBothRumble, 0))
+            Commands.runOnce(() -> controller.setRumble(RumbleType.kBothRumble, 0))
                 .andThen(new TravelPosition(m_Elevator, m_Arm, m_EndEffector)));
 
     SmartDashboard.putBoolean("Manual Mode", manualMode);
