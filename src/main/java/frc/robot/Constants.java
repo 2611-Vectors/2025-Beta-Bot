@@ -146,8 +146,8 @@ public final class Constants {
     public static final double LEFT_OFFSET = 0.075; // In Meters
     public static final double RIGHT_OFFSET = -0.255; // In Meters
 
-    public static final Pose2d R1 = new Pose2d(1.13847, 7.10903, Rotation2d.fromDegrees(120));
-    public static final Pose2d R0 = new Pose2d(1.13847, .94297, Rotation2d.fromDegrees(-120));
+    public static final Pose2d R1 = new Pose2d(1.599, 7.346, Rotation2d.fromDegrees(125));
+    public static final Pose2d R0 = new Pose2d(1.599, 0.696, Rotation2d.fromDegrees(-125));
 
     public static final Map<Pose2d, Double> poseAngleMap = new HashMap<>();
 
