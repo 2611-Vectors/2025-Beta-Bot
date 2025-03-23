@@ -21,6 +21,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -244,6 +245,10 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
+    controller
+        .rightBumper()
+        .whileTrue(Commands.run(() -> controller.setRumble(RumbleType.kBothRumble, 1)))
+        .onFalse(Commands.run(() -> controller.setRumble(RumbleType.kBothRumble, 0)));
 
     // CLIMB CONTROLS
     // new Trigger(() -> buttonBoard.getRightY() > -0.6)
@@ -362,9 +367,11 @@ public class RobotContainer {
     new Trigger(() -> buttonBoard.getLeftY() > 0.6)
         .and(() -> !manualMode)
         .whileTrue(
-            new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector)
+            new LoadStationIntake(null, m_Elevator, m_Arm, m_EndEffector)
                 .andThen(new HoldPosition(m_Elevator, m_Arm, INTAKE_HEIGHT_IN, INTAKE_ANGLE)))
-        .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
+        .onFalse(
+            Commands.runOnce(() -> controller.setRumble(RumbleType.kBothRumble, 0))
+                .andThen(new TravelPosition(m_Elevator, m_Arm, m_EndEffector)));
 
     SmartDashboard.putBoolean("Manual Mode", manualMode);
     buttonBoard
@@ -399,7 +406,6 @@ public class RobotContainer {
             () -> -slewRateY.calculate(controller.getLeftX()),
             () -> -controller.getRightX()));
 
-
     // Lock to 0° when A button is held
     controller
         .a()
@@ -432,9 +438,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // region Auton Command
-    m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
+    if ((int) m_Drive.getPose().getX() == 0) m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
-    return new Test3Piece(m_Elevator, m_Arm, m_EndEffector, m_Climb);
+    return new Test3Piece(m_Drive, m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return CustomAutoBuilder.getAutonCommand(m_Drive);
   }

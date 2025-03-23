@@ -117,8 +117,9 @@ public class Vision extends SubsystemBase {
         // Check whether to reject pose
         boolean rejectPose =
             observation.tagCount() == 0 // Must have at least one tag
-                || (observation.tagCount() == 1
-                    && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
+                || observation.ambiguity() > maxAmbiguity
+                // || (observation.tagCount() == 1
+                //     && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
                 || Math.abs(observation.pose().getZ())
                     > maxZError // Must have realistic Z coordinate
 
@@ -164,11 +165,12 @@ public class Vision extends SubsystemBase {
             observation.pose().toPose2d()); // new Pose2d(x, y, visonPose2d.getRotation()));
         // Send vision observation
 
-        consumer.accept(
-            observation.pose().toPose2d(),
-            // new Pose2d(x, y, visonPose2d.getRotation()),
-            observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        for (Pose3d pose : robotPosesAccepted)
+          consumer.accept(
+              pose.toPose2d(),
+              // new Pose2d(x, y, visonPose2d.getRotation()),
+              observation.timestamp(),
+              VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
 
       // Log camera datadata

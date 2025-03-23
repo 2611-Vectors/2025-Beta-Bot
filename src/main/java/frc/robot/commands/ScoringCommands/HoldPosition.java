@@ -14,11 +14,7 @@ import frc.robot.subsystems.Mechanisms.Elevator;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class HoldPosition extends SequentialCommandGroup {
   /** Creates a new HoldPosition. */
-  public HoldPosition(
-      Elevator m_Elevator,
-      Arm m_Arm,
-      double height,
-      double angle) {
+  public HoldPosition(Elevator m_Elevator, Arm m_Arm, double height, double angle) {
     super(
         Commands.parallel(
             m_Arm.setPivotAngle(() -> angle), m_Elevator.setElevatorPosition(() -> height)));

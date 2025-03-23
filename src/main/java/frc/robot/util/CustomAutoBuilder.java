@@ -5,6 +5,8 @@
 package frc.robot.util;
 
 import static frc.robot.Constants.AutonConstants.*;
+import static frc.robot.Constants.VisionConstants.FIELD_HEIGHT;
+import static frc.robot.Constants.VisionConstants.FIELD_WIDTH;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
@@ -21,10 +23,12 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.Mechanisms.Arm;
 import frc.robot.subsystems.drive.Drive;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** Add your docs here. */
@@ -123,6 +127,27 @@ public class CustomAutoBuilder {
   }
 
   public static ArrayList<Command> drivePaths;
+
+  public static Pose2d flipRed(Pose2d point) {
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+      point =
+          (new Pose2d(
+              FIELD_WIDTH - point.getX(),
+              FIELD_HEIGHT - point.getY(),
+              Rotation2d.fromDegrees(Arm.flipAngle(point.getRotation().getDegrees()))));
+    }
+
+    return point;
+  }
+
+  public static Command generateInitialPath(Pose2d startingPose) {
+    startingPose = flipRed(startingPose);
+    Logger.recordOutput("Auton Start Point", startingPose);
+
+    return AutoBuilder.followPath(
+        getPathFromPoints(
+            startingPose, applyOffset(scoreChoosers[0].get(), lateralChoosers[0].get())));
+  }
 
   public static void update() {
     ArrayList<Pose2d[]> paths = new ArrayList<>();

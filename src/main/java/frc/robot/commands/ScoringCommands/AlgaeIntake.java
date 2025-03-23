@@ -21,9 +21,7 @@ public class AlgaeIntake extends SequentialCommandGroup {
       Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, double height, double angle) {
     super(
         m_Elevator.setUntil(() -> height),
-        Commands.race(
-            m_Elevator.setElevatorPosition(() -> height), 
-            m_Arm.setUntil(() -> angle)),
+        Commands.race(m_Elevator.setElevatorPosition(() -> height), m_Arm.setUntil(() -> angle)),
         Commands.parallel(
             m_Arm.setPivotAngle(() -> angle),
             m_Elevator.setElevatorPosition(() -> height),

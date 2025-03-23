@@ -23,7 +23,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.subsystems.Mechanisms.Arm;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +55,7 @@ public final class Constants {
   public static class ArmConstants {
     public static final int ARM_MOTOR_ID = 44;
     public static final int ARM_ENCODER_PORT = 0;
-    public static final int PIVOT_ANGLE_OFFSET = -6;
+    public static final int PIVOT_ANGLE_OFFSET = -37;
 
     public static final double ARM_GEAR_RATIO = 43.95;
     public static final double ARM_MAX_VOLTAGE = 5.0; // Set this to 8 for competition
@@ -90,10 +89,10 @@ public final class Constants {
   public static class Setpoints {
     public static final double HOME_HEIGHT_IN = 25.0;
     public static final double TRAVEL_HEIGHT_IN = 25.0;
-    public static final double L2_HEIGHT_IN = 23.0; // was 24
-    public static final double L3_HEIGHT_IN = 38; // was 40
-    public static final double L4_HEIGHT_IN = 67.0;
-    public static final double INTAKE_HEIGHT_IN = 53; // was 53.25
+    public static final double L2_HEIGHT_IN = 23.0;
+    public static final double L3_HEIGHT_IN = 39.0; // was 38
+    public static final double L4_HEIGHT_IN = 67.5; // was 67
+    public static final double INTAKE_HEIGHT_IN = 52; // was 53
     public static final double ALGAE_PICK2_HEIGHT = 32.0;
     public static final double ALGAE_PICK3_HEIGHT = 48.0;
     public static final double PROCESSOR_HEIGHT = 27.0;
@@ -104,7 +103,7 @@ public final class Constants {
     public static final double L2_ANGLE = -55;
     public static final double L3_ANGLE = -55;
     public static final double L4_ANGLE = -40;
-    public static final double INTAKE_ANGLE = Arm.flipAngle(60);
+    public static final double INTAKE_ANGLE = 118; // was 120
     public static final double ALGAE_PICK2_ANGLE = 130;
     public static final double ALGAE_PICK3_ANGLE = 130;
     public static final double PROCCESOR_ANGLE = 180;
@@ -168,7 +167,7 @@ public final class Constants {
     }
 
     public static final double MAX_VELOCITY = 5.0; // 5.00; // Change back to 4 // 5.1
-    public static final double MAX_ACCELERATION = 2.5; // 2.5; // Change back to 2.1 // 2.9
+    public static final double MAX_ACCELERATION = 2.55; // 2.5; // Change back to 2.1 // 2.9
   }
 
   public static class VisionConstants {

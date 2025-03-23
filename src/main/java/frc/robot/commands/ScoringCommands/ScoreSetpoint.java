@@ -27,8 +27,7 @@ public class ScoreSetpoint extends SequentialCommandGroup {
             m_Arm.setPivotAngle(() -> angle),
             Commands.waitSeconds(0.25)),
         Commands.race(
-                m_Elevator.setElevatorPosition(() -> height),
-                m_Arm.setUntil(() -> TRAVEL_ANGLE)),
+            m_Elevator.setElevatorPosition(() -> height), m_Arm.setUntil(() -> TRAVEL_ANGLE)),
         m_EndEffector.setEndEffectorVoltage(() -> 0.0));
   }
 }

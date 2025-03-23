@@ -50,7 +50,8 @@ public class Left3Auton extends SequentialCommandGroup {
         Commands.parallel(
             drivePath1,
             Commands.sequence(
-                new WaitCommand(0.25), new LoadStationIntake(m_Elevator, m_Arm, m_EndEffector))),
+                new WaitCommand(0.25),
+                new LoadStationIntake(null, m_Elevator, m_Arm, m_EndEffector))),
         // Commands.race(
         drivePath2,
         // Commands.sequence(
