@@ -55,7 +55,7 @@ public final class Constants {
   public static class ArmConstants {
     public static final int ARM_MOTOR_ID = 44;
     public static final int ARM_ENCODER_PORT = 0;
-    public static final int PIVOT_ANGLE_OFFSET = -37;
+    public static final int PIVOT_ANGLE_OFFSET = -50;
 
     public static final double ARM_GEAR_RATIO = 43.95;
     public static final double ARM_MAX_VOLTAGE = 5.0; // Set this to 8 for competition
@@ -92,7 +92,7 @@ public final class Constants {
     public static final double L2_HEIGHT_IN = 23.0;
     public static final double L3_HEIGHT_IN = 39.0; // was 38
     public static final double L4_HEIGHT_IN = 67.5; // was 67
-    public static final double INTAKE_HEIGHT_IN = 52; // was 53
+    public static final double INTAKE_HEIGHT_IN = 52.5; // was 53
     public static final double ALGAE_PICK2_HEIGHT = 32.0;
     public static final double ALGAE_PICK3_HEIGHT = 48.0;
     public static final double PROCESSOR_HEIGHT = 27.0;
@@ -145,8 +145,8 @@ public final class Constants {
     public static final double LEFT_OFFSET = 0.075; // In Meters
     public static final double RIGHT_OFFSET = -0.255; // In Meters
 
-    public static final Pose2d R1 = new Pose2d(1.599, 7.346, Rotation2d.fromDegrees(125));
-    public static final Pose2d R0 = new Pose2d(1.599, 0.696, Rotation2d.fromDegrees(-125));
+    public static final Pose2d R1 = new Pose2d(1.13847, 7.10903, Rotation2d.fromDegrees(120));
+    public static final Pose2d R0 = new Pose2d(1.13847, .94297, Rotation2d.fromDegrees(-120));
 
     public static final Map<Pose2d, Double> poseAngleMap = new HashMap<>();
 

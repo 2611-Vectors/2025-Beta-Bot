@@ -97,6 +97,29 @@ public class Elevator extends SubsystemBase {
         });
   }
 
+  public Command setSlowElevatorPosition(Supplier<Double> target) {
+    return run(
+        () -> {
+          double targetActual = target.get();
+          if (targetActual < STARTING_HEIGHT - 3.38) {
+            targetActual = HOME_HEIGHT_IN;
+          }
+          Logger.recordOutput("Elevator/TargetPosition", targetActual);
+
+          // // Simulator update
+          MechanismTarget.updateElevator(targetActual);
+
+          double pidPart = elevatorPID.calculate(getElevatorPosition(), targetActual);
+          double ffPart = elevatorFF.calculate(targetActual);
+          // if (Math.abs(getElevatorPosition() - targetActual) < 0.25) {
+          //   pidPart = 0;
+          //   ffPart = elevatorFF.getKg();
+          // }
+          Logger.recordOutput("Elevator/VoltageApplied", MathUtil.clamp(pidPart + ffPart, -1.8, 2));
+          setVoltage(MathUtil.clamp(pidPart + ffPart, -1.8, 2));
+        });
+  }
+
   private final ProfiledPIDController elevatorProfiledController =
       new ProfiledPIDController(
           elevatorPID.getP(),
@@ -163,14 +186,15 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    Logger.recordOutput("Elevator/LeftEncoder", getLeftElevatorPosition());
-    Logger.recordOutput("Elevator/RightEncoder", getRightElevatorPosition());
+    // Logger.recordOutput("Elevator/LeftEncoder", getLeftElevatorPosition());
+    // Logger.recordOutput("Elevator/RightEncoder", getRightElevatorPosition());
 
-    Logger.recordOutput(
-        "Elevator/Left Elevator Supplied Current", leftMotor.getSupplyCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "Elevator/Right Elevator Supplied Current",
-        rightMotor.getSupplyCurrent().getValueAsDouble());
+    // Logger.recordOutput(
+    //     "Elevator/Left Elevator Supplied Current",
+    // leftMotor.getSupplyCurrent().getValueAsDouble());
+    // Logger.recordOutput(
+    //     "Elevator/Right Elevator Supplied Current",
+    //     rightMotor.getSupplyCurrent().getValueAsDouble());
     Logger.recordOutput("Elevator/Current Position", getElevatorPosition());
     MechanismActual.updateElevator(getElevatorPosition());
     elevatorPID.update();

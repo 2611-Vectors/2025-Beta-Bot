@@ -39,7 +39,7 @@ public class Test3Piece extends SequentialCommandGroup {
                 Commands.race(
                     startPath.get(),
                     m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
-                    m_Elevator.setElevatorPosition(() -> getElevatorPosition(L4_HEIGHT_IN))),
+                    m_Elevator.setSlowElevatorPosition(() -> L4_HEIGHT_IN)),
                 AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
                 scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[1], drivePaths[2]),
                 scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[3], drivePaths[4]),

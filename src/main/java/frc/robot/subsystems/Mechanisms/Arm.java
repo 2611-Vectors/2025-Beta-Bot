@@ -75,8 +75,8 @@ public class Arm extends SubsystemBase {
   /** Function to calculate the relative distance between two angles */
   public static double getRelativeAngle(double angle1, double angle2) {
     double difference = (angle2 - angle1 + 180) % 360 - 180;
-    Logger.recordOutput(
-        "Angle/Arm Relative Angle", difference < -180 ? difference + 360 : difference);
+    // Logger.recordOutput(
+    //     "Angle/Arm Relative Angle", difference < -180 ? difference + 360 : difference);
     return difference < -180 ? difference + 360 : difference;
   }
 
@@ -155,7 +155,7 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     Logger.recordOutput("Arm/current angle", getPivotAngle());
-    Logger.recordOutput("Arm/Motor Position", arm.getPosition().getValueAsDouble());
+    // Logger.recordOutput("Arm/Motor Position", arm.getPosition().getValueAsDouble());
     MechanismActual.updateArm(getPivotAngle());
     armPID.update();
 

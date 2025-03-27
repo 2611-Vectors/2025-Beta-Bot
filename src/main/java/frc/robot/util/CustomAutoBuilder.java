@@ -154,10 +154,7 @@ public class CustomAutoBuilder {
     drivePaths = new ArrayList<>();
     startPath =
         getPathFromPoints(
-            startChooser.get(),
-            applyOffset(scoreChoosers[0].get(), lateralChoosers[0].get()),
-            4,
-            2.7);
+            startChooser.get(), applyOffset(scoreChoosers[0].get(), lateralChoosers[0].get()));
 
     paths.add(startPath.getPathPoses().toArray(new Pose2d[startPath.getPathPoses().size()]));
     autonPath = Commands.sequence(trajectoryDisplay(startPath), AutoBuilder.followPath(startPath));

@@ -226,9 +226,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private final SlewRateLimiter slewRateX = new SlewRateLimiter(1.1);
+  private final SlewRateLimiter slewRateX = new SlewRateLimiter(1.3); //was 1.1
 
-  private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.1);
+  private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.3); // was 1.1
 
   private void configureTestBindings() {
     // region TestBindings
@@ -429,6 +429,9 @@ public class RobotContainer {
                             new Pose2d(m_Drive.getPose().getTranslation(), new Rotation2d())),
                     m_Drive)
                 .ignoringDisable(true));
+    // (controller.x().and(() -> buttonBoard.getLeftY() > 0.6))
+    //     .onTrue(new TravelPositionFlipped(m_Elevator, m_Arm, m_EndEffector))
+    //     .onFalse(new LoadStationIntake(null, m_Elevator, m_Arm, m_EndEffector));
   }
 
   /**

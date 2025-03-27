@@ -160,17 +160,16 @@ public class Vision extends SubsystemBase {
         // double x = filterX.calculate(visonPose2d.getX());
         // double y = filterY.calculate(visonPose2d.getY());
 
-        Logger.recordOutput(
-            "TestOdometry/FilterPosition",
-            observation.pose().toPose2d()); // new Pose2d(x, y, visonPose2d.getRotation()));
+        // Logger.recordOutput(
+        //     "TestOdometry/FilterPosition",
+        //     observation.pose().toPose2d()); // new Pose2d(x, y, visonPose2d.getRotation()));
         // Send vision observation
 
-        for (Pose3d pose : robotPosesAccepted)
-          consumer.accept(
-              pose.toPose2d(),
-              // new Pose2d(x, y, visonPose2d.getRotation()),
-              observation.timestamp(),
-              VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        consumer.accept(
+            observation.pose().toPose2d(),
+            // new Pose2d(x, y, visonPose2d.getRotation()),
+            observation.timestamp(),
+            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
 
       // Log camera datadata
