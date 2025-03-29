@@ -35,9 +35,9 @@ import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PID_FF_Tuners;
 import frc.robot.commands.ScoringCommands.AlgaeIntake;
-import frc.robot.commands.ScoringCommands.AlgaeScore;
 import frc.robot.commands.ScoringCommands.AlgaeTravelPosition;
 import frc.robot.commands.ScoringCommands.AlignReef;
+import frc.robot.commands.ScoringCommands.BargeScore;
 import frc.robot.commands.ScoringCommands.HoldPosition;
 import frc.robot.commands.ScoringCommands.L1Scoring;
 import frc.robot.commands.ScoringCommands.LoadStationIntake;
@@ -60,6 +60,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.CustomAutoBuilder;
+import frc.robot.util.MechanismTarget;
 import java.util.Set;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -202,7 +203,8 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-    configProgrammingButtonConfigs();
+    // configProgrammingButtonConfigs();
+    // configureTestBindings();
   }
 
   private void configProgrammingButtonConfigs() {
@@ -226,11 +228,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private final SlewRateLimiter slewRateX = new SlewRateLimiter(1.3); //was 1.1
+  private final SlewRateLimiter slewRateX = new SlewRateLimiter(1.3); // was 1.1
 
   private final SlewRateLimiter slewRateY = new SlewRateLimiter(1.3); // was 1.1
 
   private void configureTestBindings() {
+
     // region TestBindings
     // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmPIDTuning(m_Arm));
     // m_Arm.setDefaultCommand(PID_FF_Tuners.ArmFFTuner(m_Arm, () -> buttonBoard.getLeftY()));
@@ -247,7 +250,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     controller
         .rightBumper()
-        .whileTrue(Commands.run(() -> controller.setRumble(RumbleType.kBothRumble, 1)))
+        .whileTrue(Commands.run(() -> controller.setRumble(RumbleType.kBothRumble, 0.6)))
         .onFalse(Commands.run(() -> controller.setRumble(RumbleType.kBothRumble, 0)));
 
     // CLIMB CONTROLS
@@ -303,7 +306,9 @@ public class RobotContainer {
             Commands.defer(
                 () ->
                     Commands.either(
-                        new AlgaeTravelPosition(m_Elevator, m_Arm, m_EndEffector),
+                        Commands.parallel(
+                            m_Elevator.holdElevator(),
+                            m_Arm.setPivotAngle(() -> MechanismTarget.targetArmAngle())),
                         new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)));
@@ -314,8 +319,7 @@ public class RobotContainer {
             Commands.defer(
                 () ->
                     Commands.either(
-                        new AlgaeScore(
-                            m_Elevator, m_Arm, m_EndEffector, PROCESSOR_HEIGHT, PROCCESOR_ANGLE),
+                        new AlgaeTravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         new L1Scoring(m_Elevator, m_Arm, m_EndEffector)
                             .andThen(new HoldPosition(m_Elevator, m_Arm, 40.0, TRAVEL_ANGLE)),
                         () -> buttonBoard.getHID().getBackButton()),
@@ -352,7 +356,9 @@ public class RobotContainer {
             Commands.defer(
                 () ->
                     Commands.either(
-                        new AlgaeTravelPosition(m_Elevator, m_Arm, m_EndEffector),
+                        Commands.parallel(
+                            m_Elevator.holdElevator(),
+                            m_Arm.setPivotAngle(() -> MechanismTarget.targetArmAngle())),
                         new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         () -> buttonBoard.getHID().getBackButton()),
                 Set.of(m_Elevator, m_Arm, m_EndEffector)));
@@ -360,8 +366,12 @@ public class RobotContainer {
     buttonBoard
         .y()
         .whileTrue(
-            new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE)
-                .andThen(new HoldPosition(m_Elevator, m_Arm, L4_HEIGHT_IN, TRAVEL_ANGLE)))
+            Commands.either(
+                new BargeScore(m_Elevator, m_Arm, m_EndEffector)
+                    .finallyDo(() -> m_Elevator.setCurrent(75)),
+                new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE)
+                    .andThen(new HoldPosition(m_Elevator, m_Arm, L4_HEIGHT_IN, TRAVEL_ANGLE)),
+                () -> buttonBoard.getHID().getBackButton()))
         .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
     new Trigger(() -> buttonBoard.getLeftY() > 0.6)
@@ -440,12 +450,17 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    // m_Elevator.setCurrent(70);
     // region Auton Command
     if ((int) m_Drive.getPose().getX() == 0) m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
     return new Test3Piece(m_Drive, m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return CustomAutoBuilder.getAutonCommand(m_Drive);
+  }
+
+  public void teleOpInit() {
+    // m_Elevator.setCurrent(70);
   }
 
   public void zeroMotors() {

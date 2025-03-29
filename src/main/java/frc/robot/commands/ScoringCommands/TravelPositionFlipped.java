@@ -4,7 +4,6 @@
 
 package frc.robot.commands.ScoringCommands;
 
-import static frc.robot.Constants.Setpoints.INTAKE_HEIGHT_IN;
 import static frc.robot.Constants.Setpoints.TRAVEL_ANGLE;
 
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,9 +19,8 @@ public class TravelPositionFlipped extends SequentialCommandGroup {
   /** Creates a new TravelPositionFlipped. */
   public TravelPositionFlipped(Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector) {
     super(
-        m_Elevator.setUntil(() -> INTAKE_HEIGHT_IN),
+        m_Elevator.setUntil(() -> 39.0),
         Commands.race(
-            m_Elevator.setElevatorPosition(() -> INTAKE_HEIGHT_IN),
-            m_Arm.setUntil(() -> -TRAVEL_ANGLE)));
+            m_Elevator.setElevatorPosition(() -> 39.0), m_Arm.setUntil(() -> -TRAVEL_ANGLE)));
   }
 }

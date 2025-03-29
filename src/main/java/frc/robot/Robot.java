@@ -163,6 +163,7 @@ public class Robot extends LoggedRobot {
     }
 
     robotContainer.zeroMotors();
+    robotContainer.teleOpInit();
   }
 
   /** This function is called periodically during operator control. */
