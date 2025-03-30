@@ -87,7 +87,6 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
-  private Boolean manualMode = false;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -375,7 +374,6 @@ public class RobotContainer {
         .onFalse(new TravelPosition(m_Elevator, m_Arm, m_EndEffector));
 
     new Trigger(() -> buttonBoard.getLeftY() > 0.6)
-        .and(() -> !manualMode)
         .whileTrue(
             new LoadStationIntake(null, m_Elevator, m_Arm, m_EndEffector)
                 .andThen(new HoldPosition(m_Elevator, m_Arm, INTAKE_HEIGHT_IN, INTAKE_ANGLE)))
@@ -383,28 +381,6 @@ public class RobotContainer {
             Commands.runOnce(() -> controller.setRumble(RumbleType.kBothRumble, 0))
                 .andThen(new TravelPosition(m_Elevator, m_Arm, m_EndEffector)));
 
-    SmartDashboard.putBoolean("Manual Mode", manualMode);
-    buttonBoard
-        .rightStick()
-        .onTrue(Commands.runOnce(() -> manualMode = !manualMode).ignoringDisable(true))
-        .onChange(
-            Commands.run(() -> SmartDashboard.putBoolean("Manual Mode", manualMode))
-                .ignoringDisable(true));
-
-    controller
-        .rightTrigger(0.8)
-        .onTrue(Commands.runOnce(() -> manualMode = !manualMode).ignoringDisable(true))
-        .onChange(
-            Commands.run(() -> SmartDashboard.putBoolean("Manual Mode", manualMode))
-                .ignoringDisable(true));
-
-    // new Trigger(() -> manualMode)
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             m_Arm.setArmVoltage(() -> buttonBoard.getRightY()),
-    //             m_Elevator.setVoltage(
-    //                 () -> -buttonBoard.getLeftY() + m_Elevator.elevatorFF.getKg())))
-    //     .whileFalse
     m_Climb.setDefaultCommand(m_Climb.runWinch(() -> buttonBoard.getRightY()));
 
     // region Driver 1 controllers
