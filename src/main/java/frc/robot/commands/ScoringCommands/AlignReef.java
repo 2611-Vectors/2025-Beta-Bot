@@ -68,6 +68,6 @@ public class AlignReef extends SequentialCommandGroup {
                   Logger.recordOutput("/targetPosition", targetPos);
                 }),
             AutoBuilder.followPath(
-                CustomAutoBuilder.getPathFromPoints(startPoint, targetPos, 2.0))));
+                CustomAutoBuilder.getPathFromPoints(startPoint, targetPos, 2, 2.75))));
   }
 }

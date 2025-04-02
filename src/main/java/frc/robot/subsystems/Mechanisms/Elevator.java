@@ -120,8 +120,9 @@ public class Elevator extends SubsystemBase {
           //   pidPart = 0;
           //   ffPart = elevatorFF.getKg();
           // }
-          Logger.recordOutput("Elevator/VoltageApplied", MathUtil.clamp(pidPart + ffPart, -1.8, 2));
-          setVoltage(MathUtil.clamp(pidPart + ffPart, -1.8, 2));
+          double voltage = MathUtil.clamp(pidPart + ffPart, -1.8, 2.3);
+          Logger.recordOutput("Elevator/VoltageApplied", voltage);
+          setVoltage(voltage);
         });
   }
 

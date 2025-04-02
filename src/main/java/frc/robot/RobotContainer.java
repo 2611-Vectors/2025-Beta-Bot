@@ -23,17 +23,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.Autons.Test3Piece;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PID_FF_Tuners;
+import frc.robot.commands.Autons.Center1Piece;
+import frc.robot.commands.Autons.Test3Piece;
 import frc.robot.commands.ScoringCommands.AlgaeIntake;
 import frc.robot.commands.ScoringCommands.AlgaeTravelPosition;
 import frc.robot.commands.ScoringCommands.AlignReef;
@@ -306,7 +306,8 @@ public class RobotContainer {
                 () ->
                     Commands.either(
                         Commands.parallel(
-                            m_Elevator.holdElevator(),
+                            m_Elevator.setElevatorPosition(
+                                () -> MechanismTarget.targetElevatorHeight()),
                             m_Arm.setPivotAngle(() -> MechanismTarget.targetArmAngle())),
                         new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         () -> buttonBoard.getHID().getBackButton()),
@@ -356,7 +357,8 @@ public class RobotContainer {
                 () ->
                     Commands.either(
                         Commands.parallel(
-                            m_Elevator.holdElevator(),
+                            m_Elevator.setElevatorPosition(
+                                () -> MechanismTarget.targetElevatorHeight()),
                             m_Arm.setPivotAngle(() -> MechanismTarget.targetArmAngle())),
                         new TravelPosition(m_Elevator, m_Arm, m_EndEffector),
                         () -> buttonBoard.getHID().getBackButton()),
@@ -367,7 +369,11 @@ public class RobotContainer {
         .whileTrue(
             Commands.either(
                 new BargeScore(m_Elevator, m_Arm, m_EndEffector)
-                    .finallyDo(() -> m_Elevator.setCurrent(75)),
+                    .finallyDo(
+                        () -> {
+                          m_Elevator.setCurrent(75);
+                          m_EndEffector.setCurrent(70);
+                        }),
                 new ScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE)
                     .andThen(new HoldPosition(m_Elevator, m_Arm, L4_HEIGHT_IN, TRAVEL_ANGLE)),
                 () -> buttonBoard.getHID().getBackButton()))
@@ -430,6 +436,8 @@ public class RobotContainer {
     // region Auton Command
     if ((int) m_Drive.getPose().getX() == 0) m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
+    if (CustomAutoBuilder.startChooser.get() == START_CENTER)
+        return new Center1Piece(m_Drive, m_Elevator, m_Arm, m_EndEffector, m_Climb);
     return new Test3Piece(m_Drive, m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return CustomAutoBuilder.getAutonCommand(m_Drive);

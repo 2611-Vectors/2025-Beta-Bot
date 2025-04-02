@@ -26,10 +26,11 @@ public class BargeScore extends SequentialCommandGroup {
         new WaitCommand(0.5),
         Commands.waitUntil(() -> Math.abs(m_EndEffector.getEndEffectorRPS()) < 5),
         Commands.runOnce(() -> m_Elevator.setCurrent(90)),
+        Commands.runOnce(() -> m_EndEffector.setCurrent(120)),
         Commands.race(
             m_Elevator
-                .setElevatorPosition(() -> 69.0)
-                .until(() -> m_Elevator.getElevatorPosition() > 67),
+                .setElevatorPosition(() -> 70.0)
+                .until(() -> m_Elevator.getElevatorPosition() > 68),
             m_Arm.setPivotAngle(() -> 110.0)),
         Commands.parallel(
             m_EndEffector.setEndEffectorVoltage(() -> -12.0),

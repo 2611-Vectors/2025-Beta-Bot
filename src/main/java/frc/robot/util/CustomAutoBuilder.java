@@ -299,8 +299,8 @@ public class CustomAutoBuilder {
     List<Waypoint> waypoints =
         new ArrayList<>(
             List.of(
-                new Waypoint(null, startPoint, startPoint),
-                new Waypoint(endPoint, endPoint, null)));
+                new Waypoint(null, startPoint, startPoint.interpolate(endPoint, 0.1)),
+                new Waypoint(endPoint.interpolate(startPoint, 0.1), endPoint, null)));
 
     List<Integer> intersectedPlanes = getIntersectedPlanes(startPoint, endPoint);
     if (intersectedPlanes.isEmpty()) return waypoints;

@@ -55,7 +55,7 @@ public final class Constants {
   public static class ArmConstants {
     public static final int ARM_MOTOR_ID = 44;
     public static final int ARM_ENCODER_PORT = 0;
-    public static final int PIVOT_ANGLE_OFFSET = -50;
+    public static final int PIVOT_ANGLE_OFFSET = -59;
 
     public static final double ARM_GEAR_RATIO = 43.95;
     public static final double ARM_MAX_VOLTAGE = 5.0; // Set this to 8 for competition

@@ -29,6 +29,7 @@ public class Test3Piece extends SequentialCommandGroup {
       Drive m_Drive, Elevator m_Elevator, Arm m_Arm, EndEffector m_EndEffector, Climb m_Climb) {
     Supplier<Command> startPath = () -> CustomAutoBuilder.generateInitialPath(m_Drive.getPose());
     Command[] drivePaths = CustomAutoBuilder.getDrivePaths();
+
     addCommands(
         Commands.parallel(
             Commands.sequence(
@@ -43,7 +44,7 @@ public class Test3Piece extends SequentialCommandGroup {
                 AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
                 scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[1], drivePaths[2]),
                 scorePiece(m_Elevator, m_Arm, m_EndEffector, drivePaths[3], drivePaths[4]),
-                Commands.waitSeconds(0.25),
+                Commands.waitSeconds(0.1),
                 m_Arm
                     .setPivotAngle(() -> TRAVEL_ANGLE)
                     .until(

@@ -6,6 +6,7 @@ package frc.robot.util;
 
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.Setpoints.TRAVEL_ANGLE;
+import static frc.robot.Constants.Setpoints.TRAVEL_HEIGHT_IN;
 
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -38,6 +39,7 @@ public class MechanismTarget {
   }
 
   public static double armTargetAngle = TRAVEL_ANGLE;
+  public static double elevatorTargetHeight = TRAVEL_HEIGHT_IN;
 
   public static void updateArm(double angle) {
     armTargetAngle = angle;
@@ -45,6 +47,7 @@ public class MechanismTarget {
   }
 
   public static void updateElevator(double position) {
+    elevatorTargetHeight = position;
     m_elevator.setLength(position / 39.37);
   }
 
@@ -60,5 +63,9 @@ public class MechanismTarget {
 
   public static double targetArmAngle() {
     return armTargetAngle;
+  }
+
+  public static double targetElevatorHeight() {
+    return elevatorTargetHeight;
   }
 }

@@ -8,7 +8,6 @@ import static frc.robot.Constants.ArmConstants.END_EFFECTOR_ID;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.PhoenixUtil;
@@ -17,11 +16,15 @@ import org.littletonrobotics.junction.Logger;
 
 public class EndEffector extends SubsystemBase {
   private final TalonFX endEffector = new TalonFX(END_EFFECTOR_ID);
-  private final LinearFilter rpsFilter = LinearFilter.movingAverage(5);
+  // private final LinearFilter rpsFilter = LinearFilter.movingAverage(5);
 
   /** Creates a new EndEffector. */
   public EndEffector() {
-    PhoenixUtil.configMotorElevator(endEffector, false, NeutralModeValue.Coast, 60);
+    PhoenixUtil.configMotorElevator(endEffector, false, NeutralModeValue.Coast, 70);
+  }
+
+  public void setCurrent(double current) {
+    PhoenixUtil.configMotorElevator(endEffector, false, NeutralModeValue.Coast, current);
   }
 
   public void setVoltage(double voltage) {
@@ -33,9 +36,9 @@ public class EndEffector extends SubsystemBase {
   }
 
   public double getEndEffectorRPS() {
-    Logger.recordOutput(
-        "Arm/Flitered End Effector RPS",
-        rpsFilter.calculate(endEffector.getVelocity().getValueAsDouble()));
+    // Logger.recordOutput(
+    //     "Arm/Flitered End Effector RPS",
+    //     rpsFilter.calculate(endEffector.getVelocity().getValueAsDouble()));
     return endEffector.getVelocity().getValueAsDouble();
   }
 
