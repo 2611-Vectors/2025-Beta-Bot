@@ -29,11 +29,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.commands.Autons.Center1Piece;
+import frc.robot.commands.Autons.Test3Piece;
 import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PID_FF_Tuners;
-import frc.robot.commands.Autons.Center1Piece;
-import frc.robot.commands.Autons.Test3Piece;
 import frc.robot.commands.ScoringCommands.AlgaeIntake;
 import frc.robot.commands.ScoringCommands.AlgaeTravelPosition;
 import frc.robot.commands.ScoringCommands.AlignReef;
@@ -437,7 +437,7 @@ public class RobotContainer {
     if ((int) m_Drive.getPose().getX() == 0) m_Drive.setPose(CustomAutoBuilder.getStartPose2d());
     // return autoChooser.get();
     if (CustomAutoBuilder.startChooser.get() == START_CENTER)
-        return new Center1Piece(m_Drive, m_Elevator, m_Arm, m_EndEffector, m_Climb);
+      return new Center1Piece(m_Drive, m_Elevator, m_Arm, m_EndEffector, m_Climb);
     return new Test3Piece(m_Drive, m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return new Left3Auton(m_Elevator, m_Arm, m_EndEffector, m_Climb);
     // return CustomAutoBuilder.getAutonCommand(m_Drive);

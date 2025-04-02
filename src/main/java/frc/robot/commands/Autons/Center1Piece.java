@@ -40,6 +40,9 @@ public class Center1Piece extends SequentialCommandGroup {
                     m_Arm.setPivotAngle(() -> TRAVEL_ANGLE),
                     m_Elevator.setSlowElevatorPosition(() -> TRAVEL_HEIGHT_IN)),
                 AutoScoreSetpoint(m_Elevator, m_Arm, m_EndEffector, L4_HEIGHT_IN, L4_ANGLE),
+                Commands.race(
+                    m_Arm.setUntil(() -> TRAVEL_ANGLE),
+                    m_Elevator.setSlowElevatorPosition(() -> L4_HEIGHT_IN)),
                 new TravelPosition(m_Elevator, m_Arm, m_EndEffector))));
   }
 
